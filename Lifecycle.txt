@@ -1,0 +1,11 @@
+| Field                | Example  |
+| -------------------- | -------- |
+| Age (Days)           | 180      |
+| Months Since Release | 6        |
+| Days To Retirement   | 365      |
+| Is Active            | Yes      |
+| Is Deprecated        | No       |
+| Is Premium Model     | Yes      |
+| Is Open Source       | No       |
+| Cost Tier            | Premium  |
+| Capability Tier      | Frontier |
