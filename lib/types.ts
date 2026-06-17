@@ -14,17 +14,26 @@ export type CategoryTag =
   | "Budget"
   | "Fast / Realtime"
   | "Open Source"
-  | "Enterprise";
+  | "Enterprise"
+  | "Agentic"
+  | "Multilingual";
+
+/** Vendor-stated agentic capability tier. */
+export type AgenticTier = "Advanced" | "Medium" | "Basic";
 
 export interface Pricing {
-  /** USD per 1M input tokens. */
+  /** USD per 1M input tokens. 0 for self-hosted open-weights models. */
   inputPer1M: number;
-  /** USD per 1M output tokens. */
+  /** USD per 1M output tokens. 0 for self-hosted open-weights models. */
   outputPer1M: number;
   /** USD per 1M cached input tokens, when supported. */
   cachedInputPer1M?: number;
   /** Fractional discount for batch/async usage, e.g. 0.5 === 50% off. */
   batchDiscount?: number;
+  /** Source-provided qualitative label, e.g. "Variable", "Low cost", "Self-host". */
+  label?: string;
+  /** Open weights with no per-token API fee (compute billed separately). */
+  selfHosted?: boolean;
 }
 
 export interface Multimodal {
@@ -103,6 +112,12 @@ export interface AIModel {
   benchmarks: Benchmarks;
   bestUseCases: string[];
   categories: CategoryTag[];
+  /** Vendor-stated agentic capability tier. */
+  agenticTier?: AgenticTier;
+  /** Overall benchmark rank (1 = best) when the model is a named leader. */
+  overallRank?: number | null;
+  /** Headline benchmark strength for leader models, e.g. "Coding". */
+  benchmarkStrength?: string;
   compliance: Compliance;
   /** Representative average latency to first response, ms. */
   latencyMsAvg: number;

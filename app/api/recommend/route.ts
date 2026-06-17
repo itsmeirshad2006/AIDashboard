@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { MODELS } from "@/data/models";
+import { getCatalog } from "@/lib/catalog";
 import { blendedCostPer1M } from "@/lib/utils";
+import type { AIModel } from "@/lib/types";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+export const maxDuration = 60;
 
 const MAX_REQUIREMENT_LENGTH = 2000;
 
@@ -23,8 +25,8 @@ export interface RecommendationResponse {
 }
 
 /** Compact, prompt-friendly projection of the catalog (keeps tokens reasonable). */
-function buildCatalog() {
-  return MODELS.map((m) => ({
+function buildCatalogProjection(models: AIModel[]) {
+  return models.map((m) => ({
     id: m.id,
     name: m.name,
     vendor: m.vendor,
@@ -32,9 +34,9 @@ function buildCatalog() {
     deprecationDate: m.deprecationDate,
     priceInputPer1M: m.pricing.inputPer1M,
     priceOutputPer1M: m.pricing.outputPer1M,
+    selfHosted: !!m.pricing.selfHosted,
     blendedPer1M: Number(blendedCostPer1M(m).toFixed(3)),
     contextWindow: m.contextWindow,
-    maxOutputTokens: m.maxOutputTokens,
     multimodal: m.multimodal,
     capabilities: m.capabilities,
     deployment: m.deployment,
@@ -42,34 +44,32 @@ function buildCatalog() {
     license: m.license,
     benchmarks: m.benchmarks,
     categories: m.categories,
+    agenticTier: m.agenticTier,
     compliance: m.compliance,
     latencyMsAvg: m.latencyMsAvg,
-    throughputTokensPerSec: m.throughputTokensPerSec,
     bestUseCases: m.bestUseCases,
   }));
 }
 
-function buildPrompt(requirement: string): string {
-  const catalog = JSON.stringify(buildCatalog());
+function buildPrompt(requirement: string, models: AIModel[]): string {
+  const catalog = JSON.stringify(buildCatalogProjection(models));
   return [
     "You are an impartial AI model selection advisor for an enterprise.",
     "Use ONLY the models in the catalog below. Never invent models or specs.",
     "",
     "Pick the 3 best-fit models for the user's requirement, ranked best first.",
     "Weigh every relevant constraint the user states or implies: budget / cost,",
-    "use case (e.g. coding, reasoning, multimodal, RAG, realtime), context-window",
-    "needs, latency/throughput, compliance (SOC2/ISO27001/HIPAA/GDPR/data residency,",
-    "whether the provider trains on your data), deployment target (API/Azure/Bedrock/",
-    "Vertex/self-hosted), open-source needs, and lifecycle (avoid recommending models",
-    "whose status is Deprecated or Retired unless explicitly asked; never recommend",
-    "a model that is being retired soon for new production work).",
+    "use case (coding, reasoning, multimodal, RAG, realtime, agentic), context-window",
+    "needs, latency, compliance (SOC2/ISO27001/HIPAA/GDPR/data residency, whether the",
+    "provider trains on your data), deployment target (API/Azure/Bedrock/Vertex/self-host),",
+    "open-source needs, and lifecycle (never recommend a model being retired soon for new work).",
+    "For self-hosted models, note there is no per-token API fee (compute billed separately).",
     "",
-    "For each pick give 2-4 concrete, specific reasons that reference the user's",
-    "stated constraints and the model's actual catalog values (cite numbers like price",
-    "or context window). Also give 0-2 honest 'watchOuts' (trade-offs/risks).",
-    'matchScore is 0-100 reflecting fit. Use the model "id" exactly as given.',
+    "For each pick give 2-4 concrete reasons that cite the user's constraints and the model's",
+    "actual catalog values (numbers like price or context window). Give 0-2 honest watchOuts.",
+    'matchScore is 0-100. Use the model "id" exactly as given in the catalog.',
     "",
-    "Return ONLY valid minified JSON matching exactly this TypeScript type — no markdown:",
+    "Return ONLY minified JSON matching exactly:",
     "{ summary: string; recommendations: { modelId: string; modelName: string; vendor: string; matchScore: number; reasons: string[]; watchOuts: string[] }[] }",
     "",
     `CATALOG = ${catalog}`,
@@ -83,27 +83,24 @@ function extractJson(text: string): unknown {
   try {
     return JSON.parse(cleaned);
   } catch {
-    // Fall back to the first {...} block in the response.
     const start = cleaned.indexOf("{");
     const end = cleaned.lastIndexOf("}");
-    if (start !== -1 && end > start) {
-      return JSON.parse(cleaned.slice(start, end + 1));
-    }
+    if (start !== -1 && end > start) return JSON.parse(cleaned.slice(start, end + 1));
     throw new Error("Model did not return parseable JSON.");
   }
 }
 
-function sanitize(parsed: unknown): RecommendationResponse {
+function sanitize(parsed: unknown, models: AIModel[]): RecommendationResponse {
   const obj = (parsed ?? {}) as Record<string, unknown>;
   const rawList = Array.isArray(obj.recommendations) ? obj.recommendations : [];
-  const validIds = new Set(MODELS.map((m) => m.id));
 
   const recommendations: RecommendationItem[] = rawList
     .map((r) => {
       const item = (r ?? {}) as Record<string, unknown>;
       const modelId = String(item.modelId ?? "");
-      const match = MODELS.find((m) => m.id === modelId) ??
-        MODELS.find((m) => m.name.toLowerCase() === String(item.modelName ?? "").toLowerCase());
+      const match =
+        models.find((m) => m.id === modelId) ??
+        models.find((m) => m.name.toLowerCase() === String(item.modelName ?? "").toLowerCase());
       if (!match) return null;
       return {
         modelId: match.id,
@@ -114,7 +111,7 @@ function sanitize(parsed: unknown): RecommendationResponse {
         watchOuts: Array.isArray(item.watchOuts) ? item.watchOuts.map(String).slice(0, 3) : [],
       } satisfies RecommendationItem;
     })
-    .filter((x): x is RecommendationItem => x !== null && validIds.has(x.modelId));
+    .filter((x): x is RecommendationItem => x !== null);
 
   return {
     summary: typeof obj.summary === "string" ? obj.summary : "",
@@ -137,9 +134,7 @@ export async function POST(req: NextRequest) {
       { status: 400 },
     );
   }
-  if (requirement.length > MAX_REQUIREMENT_LENGTH) {
-    requirement = requirement.slice(0, MAX_REQUIREMENT_LENGTH);
-  }
+  if (requirement.length > MAX_REQUIREMENT_LENGTH) requirement = requirement.slice(0, MAX_REQUIREMENT_LENGTH);
 
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
@@ -152,18 +147,19 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const modelName = process.env.GEMINI_MODEL || "gemini-2.0-flash";
+  const modelName = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 
   try {
+    const { models } = await getCatalog();
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
       model: modelName,
       generationConfig: { responseMimeType: "application/json", temperature: 0.3 },
     });
 
-    const result = await model.generateContent(buildPrompt(requirement));
+    const result = await model.generateContent(buildPrompt(requirement, models));
     const text = result.response.text();
-    const data = sanitize(extractJson(text));
+    const data = sanitize(extractJson(text), models);
 
     if (data.recommendations.length === 0) {
       return NextResponse.json(
