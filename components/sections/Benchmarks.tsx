@@ -11,11 +11,12 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from "recharts";
-import { Radar as RadarIcon, Trophy } from "lucide-react";
+import { Crown, Radar as RadarIcon, Trophy } from "lucide-react";
 import type { AIModel } from "@/lib/types";
-import { Card, CardContent, CardHeader, CardTitle, ScoreBar, SectionHeading } from "@/components/ui/primitives";
+import { Badge, Card, CardContent, CardHeader, CardTitle, ScoreBar, SectionHeading } from "@/components/ui/primitives";
 import { ModelMultiSelect } from "@/components/ModelMultiSelect";
 import { BENCHMARK_AXES, CHART_COLORS, vendorColor } from "@/lib/constants";
+import { capabilityScore, cn } from "@/lib/utils";
 
 const DIMENSIONS = [
   { key: "reasoning", label: "Reasoning" },
@@ -25,11 +26,26 @@ const DIMENSIONS = [
   { key: "vision", label: "Vision" },
 ] as const;
 
-const DEFAULT_RADAR = ["claude-opus-4", "o3", "gemini-2-5-pro"];
+function topStrength(m: AIModel): string {
+  const entries: [string, number][] = [
+    ["Reasoning", m.benchmarks.reasoning],
+    ["Coding", m.benchmarks.coding],
+    ["Math", m.benchmarks.math],
+    ["Multilingual", m.benchmarks.multilingual],
+    ["Vision", m.benchmarks.vision],
+  ];
+  return entries.sort((a, b) => b[1] - a[1])[0][0];
+}
 
 export function Benchmarks({ models }: { models: AIModel[] }) {
-  const [selected, setSelected] = useState<string[]>(
-    DEFAULT_RADAR.filter((id) => models.some((m) => m.id === id)),
+  const [selected, setSelected] = useState<string[]>(() =>
+    [...models]
+      .sort(
+        (a, b) =>
+          (a.overallRank ?? 99) - (b.overallRank ?? 99) || capabilityScore(b) - capabilityScore(a),
+      )
+      .slice(0, 3)
+      .map((m) => m.id),
   );
 
   const chosen = useMemo(
@@ -49,13 +65,65 @@ export function Benchmarks({ models }: { models: AIModel[] }) {
     [chosen],
   );
 
+  const overallLeaders = useMemo(() => {
+    const ranked = models.filter((m) => typeof m.overallRank === "number");
+    if (ranked.length >= 3) {
+      return [...ranked]
+        .sort((a, b) => (a.overallRank as number) - (b.overallRank as number))
+        .slice(0, 8)
+        .map((m) => ({ model: m, rank: m.overallRank as number, strength: m.benchmarkStrength ?? topStrength(m) }));
+    }
+    return [...models]
+      .sort((a, b) => capabilityScore(b) - capabilityScore(a))
+      .slice(0, 8)
+      .map((m, i) => ({ model: m, rank: i + 1, strength: m.benchmarkStrength ?? topStrength(m) }));
+  }, [models]);
+
   return (
     <div className="space-y-5">
       <SectionHeading
         icon={RadarIcon}
         title="Benchmark Leaders"
-        description="Normalized 0–100 scores across reasoning, coding, math, multilingual and vision. Leaders per dimension, plus a radar to compare models head-to-head."
+        description="Normalized 0–100 scores across reasoning, coding, math, multilingual and vision. Overall and per-dimension leaders, plus a radar to compare models head-to-head."
       />
+
+      {/* Overall leaders */}
+      <Card>
+        <CardHeader className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2">
+            <Crown className="h-4 w-4 text-brand" /> Overall benchmark ranking
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
+            {overallLeaders.map(({ model, rank, strength }) => (
+              <div
+                key={model.id}
+                className={cn(
+                  "flex items-center gap-3 rounded-lg border p-3",
+                  rank <= 3 ? "border-brand/40 bg-brand-subtle/40" : "border-border bg-muted/30",
+                )}
+              >
+                <span
+                  className={cn(
+                    "inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold",
+                    rank === 1 ? "bg-brand text-brand-foreground" : rank <= 3 ? "bg-brand-muted text-brand" : "bg-muted text-muted-foreground",
+                  )}
+                >
+                  {rank}
+                </span>
+                <div className="min-w-0">
+                  <p className="flex items-center gap-1.5 truncate text-sm font-semibold text-foreground">
+                    <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: vendorColor(model.vendor) }} />
+                    {model.name}
+                  </p>
+                  {strength ? <Badge tone="outline" className="mt-1">{strength}</Badge> : null}
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Leaders per dimension */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">

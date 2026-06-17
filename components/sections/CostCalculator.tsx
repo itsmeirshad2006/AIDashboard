@@ -15,7 +15,7 @@ import { Calculator } from "lucide-react";
 import type { AIModel } from "@/lib/types";
 import { Card, CardContent, CardHeader, CardTitle, SectionHeading } from "@/components/ui/primitives";
 import { vendorColor } from "@/lib/constants";
-import { cn, formatTokens, formatUSD, monthlyCost } from "@/lib/utils";
+import { cn, formatTokens, formatUSD, hasApiPricing, monthlyCost } from "@/lib/utils";
 
 const PRESETS = [
   { label: "Prototype", input: 5, output: 1 },
@@ -29,11 +29,14 @@ export function CostCalculator({ models }: { models: AIModel[] }) {
   const [output, setOutput] = useState(10);
   const [batch, setBatch] = useState(false);
 
+  const meteredModels = useMemo(() => models.filter(hasApiPricing), [models]);
+  const selfHostedCount = models.length - meteredModels.length;
+
   const ranked = useMemo(() => {
-    return models
+    return meteredModels
       .map((m) => ({ model: m, cost: monthlyCost(m, input, output, batch) }))
       .sort((a, b) => a.cost - b.cost);
-  }, [models, input, output, batch]);
+  }, [meteredModels, input, output, batch]);
 
   const cheapest = ranked[0];
   const chartData = ranked.slice(0, 12).map((r) => ({
@@ -106,11 +109,20 @@ export function CostCalculator({ models }: { models: AIModel[] }) {
               Apply batch discount where available
             </label>
 
-            <div className="rounded-lg border border-brand/30 bg-brand-subtle/50 p-3">
-              <p className="text-xs text-muted-foreground">Cheapest option</p>
-              <p className="text-sm font-semibold text-foreground">{cheapest.model.name}</p>
-              <p className="text-lg font-bold text-brand tnum">{formatUSD(cheapest.cost)}/mo</p>
-            </div>
+            {cheapest ? (
+              <div className="rounded-lg border border-brand/30 bg-brand-subtle/50 p-3">
+                <p className="text-xs text-muted-foreground">Cheapest option</p>
+                <p className="text-sm font-semibold text-foreground">{cheapest.model.name}</p>
+                <p className="text-lg font-bold text-brand tnum">{formatUSD(cheapest.cost)}/mo</p>
+              </div>
+            ) : null}
+
+            {selfHostedCount > 0 ? (
+              <p className="text-xs text-muted-foreground">
+                {selfHostedCount} self-hosted open-weights model{selfHostedCount > 1 ? "s are" : " is"} excluded —
+                no per-token API fee (you pay for compute).
+              </p>
+            ) : null}
           </CardContent>
         </Card>
 

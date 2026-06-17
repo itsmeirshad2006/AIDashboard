@@ -16,27 +16,29 @@ import { Gauge } from "lucide-react";
 import type { AIModel } from "@/lib/types";
 import { Card, CardContent, CardHeader, CardTitle, ScoreBar, SectionHeading } from "@/components/ui/primitives";
 import { vendorColor } from "@/lib/constants";
-import { blendedCostPer1M, capabilityScore, formatPricePer1M, valueScore } from "@/lib/utils";
+import { blendedCostPer1M, capabilityScore, formatPricePer1M, hasApiPricing, valueScore } from "@/lib/utils";
 
 export function ValueForMoney({ models }: { models: AIModel[] }) {
+  const metered = useMemo(() => models.filter(hasApiPricing), [models]);
+
   const ranked = useMemo(() => {
-    const withValue = models.map((m) => ({ model: m, value: valueScore(m) }));
-    const max = Math.max(...withValue.map((w) => w.value));
+    const withValue = metered.map((m) => ({ model: m, value: valueScore(m) }));
+    const max = Math.max(...withValue.map((w) => w.value), 1);
     return withValue
       .map((w) => ({ ...w, index: (w.value / max) * 100 }))
       .sort((a, b) => b.value - a.value);
-  }, [models]);
+  }, [metered]);
 
   const scatterData = useMemo(
     () =>
-      models.map((m) => ({
+      metered.map((m) => ({
         x: Number(blendedCostPer1M(m).toFixed(3)),
         y: Number(capabilityScore(m).toFixed(1)),
         z: 100,
         name: m.name,
         vendor: m.vendor,
       })),
-    [models],
+    [metered],
   );
 
   return (

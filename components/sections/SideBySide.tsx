@@ -26,11 +26,12 @@ interface Row {
   better?: "higher" | "lower";
 }
 
-const DEFAULT_SELECTION = ["gpt-4_1", "claude-sonnet-4", "gemini-2-5-pro"];
-
 export function SideBySide({ models }: { models: AIModel[] }) {
-  const [selected, setSelected] = useState<string[]>(
-    DEFAULT_SELECTION.filter((id) => models.some((m) => m.id === id)),
+  const [selected, setSelected] = useState<string[]>(() =>
+    [...models]
+      .sort((a, b) => capabilityScore(b) - capabilityScore(a))
+      .slice(0, 3)
+      .map((m) => m.id),
   );
 
   const chosen = useMemo(
@@ -39,9 +40,10 @@ export function SideBySide({ models }: { models: AIModel[] }) {
   );
 
   const rows: Row[] = [
-    { group: "Pricing", label: "Input / 1M", render: (m) => formatPricePer1M(m.pricing.inputPer1M), num: (m) => m.pricing.inputPer1M, better: "lower" },
-    { group: "Pricing", label: "Output / 1M", render: (m) => formatPricePer1M(m.pricing.outputPer1M), num: (m) => m.pricing.outputPer1M, better: "lower" },
-    { group: "Pricing", label: "Blended / 1M", render: (m) => formatPricePer1M(blendedCostPer1M(m)), num: (m) => blendedCostPer1M(m), better: "lower" },
+    { group: "Pricing", label: "Pricing model", render: (m) => <span className="text-xs">{m.pricing.label ?? (m.pricing.selfHosted ? "Self-host" : "Metered API")}</span> },
+    { group: "Pricing", label: "Input / 1M", render: (m) => (m.pricing.selfHosted ? "Self-host" : formatPricePer1M(m.pricing.inputPer1M)), num: (m) => m.pricing.inputPer1M, better: "lower" },
+    { group: "Pricing", label: "Output / 1M", render: (m) => (m.pricing.selfHosted ? "Self-host" : formatPricePer1M(m.pricing.outputPer1M)), num: (m) => m.pricing.outputPer1M, better: "lower" },
+    { group: "Pricing", label: "Blended / 1M", render: (m) => (m.pricing.selfHosted ? "Self-host" : formatPricePer1M(blendedCostPer1M(m))), num: (m) => blendedCostPer1M(m), better: "lower" },
     { group: "Pricing", label: "Cached input / 1M", render: (m) => (m.pricing.cachedInputPer1M != null ? formatPricePer1M(m.pricing.cachedInputPer1M) : "—") },
     { group: "Pricing", label: "Batch discount", render: (m) => (m.pricing.batchDiscount ? `${Math.round(m.pricing.batchDiscount * 100)}%` : "—") },
 
@@ -59,6 +61,7 @@ export function SideBySide({ models }: { models: AIModel[] }) {
     { group: "Capabilities", label: "Streaming", render: (m) => <BoolCell value={m.capabilities.streaming} /> },
     { group: "Capabilities", label: "Fine-tuning", render: (m) => <BoolCell value={m.capabilities.fineTuning} /> },
     { group: "Capabilities", label: "Reasoning mode", render: (m) => <BoolCell value={m.capabilities.reasoningMode} /> },
+    { group: "Capabilities", label: "Agentic tier", render: (m) => <span className="text-xs">{m.agenticTier ?? "—"}</span> },
 
     { group: "Deployment", label: "Direct API", render: (m) => <BoolCell value={m.deployment.api} /> },
     { group: "Deployment", label: "Azure", render: (m) => <BoolCell value={m.deployment.azure} /> },

@@ -1,35 +1,42 @@
 /**
- * Shared visual constants. Chart colours are chosen to read well in both
- * light and dark themes and to harmonise with the MoroHub green accent.
+ * Shared visual constants — restrained MoroHub palette.
+ * Only the MoroHub green accent and cool slate neutrals are used; no bright
+ * or saturated "jazzy" hues. Multi-series charts step through greens into
+ * slate so series stay distinguishable while remaining on-brand.
  */
 
 export const BRAND_GREEN = "#5BAA2E";
 
-/** Ordered palette for multi-series charts. */
+/** Ordered palette for multi-series charts (green → slate). */
 export const CHART_COLORS = [
-  "#5BAA2E", // brand green
-  "#2563EB", // blue
-  "#0EA5A4", // teal
-  "#F59E0B", // amber
-  "#7C3AED", // violet
-  "#E11D48", // rose
-  "#0891B2", // cyan
-  "#65A30D", // lime
+  "#5BAA2E", // MoroHub green
+  "#2E6F1E", // deep green
+  "#7CB342", // light green
+  "#4C6B7A", // slate-teal
+  "#64748B", // slate
+  "#94A3B8", // light slate
 ];
 
-/** Stable colour per vendor for legends and badges. */
+/** Stable, on-brand colour per vendor (a green→slate ramp, muted throughout). */
 export const VENDOR_COLORS: Record<string, string> = {
-  OpenAI: "#10A37F",
-  Anthropic: "#D97757",
-  Google: "#4285F4",
-  Meta: "#0668E1",
-  "Mistral AI": "#FA520F",
-  xAI: "#111827",
-  DeepSeek: "#4D6BFE",
+  OpenAI: "#2E6F1E",
+  Anthropic: "#4F9A33",
+  Google: "#79B84A",
+  Meta: "#5E8A6B",
+  "Mistral AI": "#4C6B7A",
+  xAI: "#3B4A5C",
+  DeepSeek: "#64748B",
+  Alibaba: "#94A3B8",
 };
 
+const FALLBACK_VENDOR_RAMP = ["#2E6F1E", "#4F9A33", "#79B84A", "#5E8A6B", "#4C6B7A", "#3B4A5C", "#64748B", "#94A3B8"];
+
+/** Deterministic colour for any vendor, including ones not in the static map. */
 export function vendorColor(vendor: string): string {
-  return VENDOR_COLORS[vendor] ?? "#64748B";
+  if (VENDOR_COLORS[vendor]) return VENDOR_COLORS[vendor];
+  let hash = 0;
+  for (let i = 0; i < vendor.length; i++) hash = (hash * 31 + vendor.charCodeAt(i)) >>> 0;
+  return FALLBACK_VENDOR_RAMP[hash % FALLBACK_VENDOR_RAMP.length];
 }
 
 /** Radar axes for the per-model benchmark charts. */

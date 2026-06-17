@@ -25,6 +25,7 @@ type SortKey =
   | "name"
   | "vendor"
   | "status"
+  | "agentic"
   | "input"
   | "output"
   | "blended"
@@ -88,27 +89,38 @@ export function CompareTable({ models }: { models: AIModel[] }) {
         },
       },
       {
+        key: "agentic",
+        label: "Agentic",
+        value: (m) => m.agenticTier ?? "",
+        render: (m) => <span className="text-xs text-muted-foreground">{m.agenticTier ?? "—"}</span>,
+      },
+      {
         key: "input",
         label: "Input /1M",
         numeric: true,
         value: (m) => m.pricing.inputPer1M,
-        render: (m) => formatPricePer1M(m.pricing.inputPer1M),
+        render: (m) =>
+          m.pricing.selfHosted ? <span className="text-xs text-muted-foreground">Self-host</span> : formatPricePer1M(m.pricing.inputPer1M),
       },
       {
         key: "output",
         label: "Output /1M",
         numeric: true,
         value: (m) => m.pricing.outputPer1M,
-        render: (m) => formatPricePer1M(m.pricing.outputPer1M),
+        render: (m) =>
+          m.pricing.selfHosted ? <span className="text-xs text-muted-foreground">Self-host</span> : formatPricePer1M(m.pricing.outputPer1M),
       },
       {
         key: "blended",
         label: "Blended /1M",
         numeric: true,
         value: (m) => blendedCostPer1M(m),
-        render: (m) => (
-          <span className="font-medium text-foreground">{formatPricePer1M(blendedCostPer1M(m))}</span>
-        ),
+        render: (m) =>
+          m.pricing.selfHosted ? (
+            <span className="text-xs text-muted-foreground">Self-host</span>
+          ) : (
+            <span className="font-medium text-foreground">{formatPricePer1M(blendedCostPer1M(m))}</span>
+          ),
       },
       {
         key: "context",

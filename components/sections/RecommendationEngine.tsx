@@ -9,7 +9,6 @@ import {
   TriangleAlert,
   CheckCircle2,
 } from "lucide-react";
-import { MODELS } from "@/data/models";
 import type { AIModel } from "@/lib/types";
 import { Badge, Card, SectionHeading } from "@/components/ui/primitives";
 import { blendedCostPer1M, cn, formatPricePer1M, formatTokens } from "@/lib/utils";
@@ -42,7 +41,7 @@ function scoreTone(score: number): string {
   return "text-muted-foreground";
 }
 
-export function RecommendationEngine({ now }: { now: Date }) {
+export function RecommendationEngine({ models }: { models: AIModel[] }) {
   const [requirement, setRequirement] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -195,10 +194,8 @@ export function RecommendationEngine({ now }: { now: Date }) {
           ) : null}
 
           {result.recommendations.map((rec, idx) => {
-            const model = MODELS.find((m) => m.id === rec.modelId) as AIModel | undefined;
-            return (
-              <RecommendationCard key={rec.modelId} rec={rec} rank={idx + 1} model={model} now={now} />
-            );
+            const model = models.find((m) => m.id === rec.modelId);
+            return <RecommendationCard key={rec.modelId} rec={rec} rank={idx + 1} model={model} />;
           })}
         </div>
       ) : null}
@@ -224,12 +221,10 @@ function RecommendationCard({
   rec,
   rank,
   model,
-  now,
 }: {
   rec: RecommendationItem;
   rank: number;
   model?: AIModel;
-  now: Date;
 }) {
   return (
     <Card className="overflow-hidden animate-fade-in">

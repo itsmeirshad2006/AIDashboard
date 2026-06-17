@@ -21,8 +21,12 @@ export function formatUSD(value: number, maxFractionDigits = 2): string {
 /** Price per 1M tokens, showing enough precision for sub-cent values. */
 export function formatPricePer1M(value: number): string {
   if (value === 0) return "$0.00";
-  const digits = value < 1 ? 3 : 2;
-  return `$${value.toFixed(digits)}`;
+  const digits = value < 0.1 ? 4 : value < 1 ? 3 : 2;
+  let s = value.toFixed(digits);
+  if (s.includes(".")) s = s.replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "");
+  const decimals = s.split(".")[1]?.length ?? 0;
+  if (decimals < 2) s = value.toFixed(2);
+  return `$${s}`;
 }
 
 /** 1_000_000 → "1M", 200_000 → "200K", 10_000_000 → "10M". */
@@ -134,6 +138,11 @@ export function isMultimodalInput(model: AIModel): boolean {
   return m.image || m.audio || m.video;
 }
 
+/** True for models billed per-token via an API (excludes self-hosted open weights). */
+export function hasApiPricing(model: AIModel): boolean {
+  return !model.pricing.selfHosted && (model.pricing.inputPer1M > 0 || model.pricing.outputPer1M > 0);
+}
+
 export function multimodalModalityCount(model: AIModel): number {
   const m = model.multimodal;
   return [m.text, m.image, m.audio, m.video].filter(Boolean).length;
@@ -157,8 +166,11 @@ export function uniqueVendors(models: AIModel[]): string[] {
   return Array.from(new Set(models.map((m) => m.vendor))).sort();
 }
 
+/** Cheapest model by blended cost among those with metered API pricing. */
 export function cheapestByBlended(models: AIModel[]): AIModel {
-  return [...models].sort((a, b) => blendedCostPer1M(a) - blendedCostPer1M(b))[0];
+  const metered = models.filter(hasApiPricing);
+  const pool = metered.length ? metered : models;
+  return [...pool].sort((a, b) => blendedCostPer1M(a) - blendedCostPer1M(b))[0];
 }
 
 export function topByBenchmark(models: AIModel[], key: keyof AIModel["benchmarks"]): AIModel {
@@ -178,17 +190,28 @@ export interface VendorFrontierCount {
   count: number;
 }
 
-/** Vendors ranked by number of ACTIVE frontier models (desc). */
+/**
+ * Vendors ranked by number of ACTIVE frontier models (desc). Ties are broken
+ * by the vendor's single strongest model (highest capability score), so the
+ * vendor leading on raw capability edges out an equal-count rival.
+ */
 export function frontierByVendor(models: AIModel[]): VendorFrontierCount[] {
   const counts = new Map<string, number>();
+  const topScore = new Map<string, number>();
   for (const m of models) {
     if (isFrontier(m) && isActive(m)) {
       counts.set(m.vendor, (counts.get(m.vendor) ?? 0) + 1);
+      topScore.set(m.vendor, Math.max(topScore.get(m.vendor) ?? 0, capabilityScore(m)));
     }
   }
   return Array.from(counts.entries())
     .map(([vendor, count]) => ({ vendor, count }))
-    .sort((a, b) => b.count - a.count || a.vendor.localeCompare(b.vendor));
+    .sort(
+      (a, b) =>
+        b.count - a.count ||
+        (topScore.get(b.vendor) ?? 0) - (topScore.get(a.vendor) ?? 0) ||
+        a.vendor.localeCompare(b.vendor),
+    );
 }
 
 export function deprecatingSoon(models: AIModel[], now: Date, days = 90): AIModel[] {
