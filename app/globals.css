@@ -1,0 +1,153 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─────────────────────────────────────────────────────────────
+   MoroHub-inspired enterprise theme.
+   Tokens are raw HSL triplets consumed as hsl(var(--token)).
+   Edit the --brand* values to drop in exact brand hex codes.
+   ───────────────────────────────────────────────────────────── */
+@layer base {
+  :root {
+    --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+      Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji", sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+      "Liberation Mono", monospace;
+
+    --background: 210 40% 99%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 42%;
+
+    --border: 214 32% 91%;
+    --input: 214 32% 88%;
+    --ring: 99 48% 42%;
+
+    /* MoroHub green accent */
+    --brand: 99 48% 40%;
+    --brand-foreground: 0 0% 100%;
+    --brand-subtle: 99 46% 95%;
+    --brand-muted: 99 38% 86%;
+
+    /* Deep teal/navy rail */
+    --ink: 200 32% 13%;
+    --ink-foreground: 210 40% 96%;
+
+    --success: 142 60% 34%;
+    --warning: 32 92% 42%;
+    --danger: 0 72% 47%;
+    --info: 215 80% 48%;
+
+    --radius: 0.625rem;
+  }
+
+  .dark {
+    --background: 220 38% 8%;
+    --foreground: 210 40% 96%;
+
+    --card: 222 38% 11%;
+    --card-foreground: 210 40% 96%;
+
+    --popover: 222 38% 11%;
+    --popover-foreground: 210 40% 96%;
+
+    --muted: 217 33% 16%;
+    --muted-foreground: 215 20% 66%;
+
+    --border: 217 26% 22%;
+    --input: 217 26% 24%;
+    --ring: 99 55% 52%;
+
+    --brand: 99 54% 52%;
+    --brand-foreground: 150 40% 8%;
+    --brand-subtle: 99 40% 14%;
+    --brand-muted: 99 28% 24%;
+
+    --ink: 222 38% 11%;
+    --ink-foreground: 210 40% 96%;
+
+    --success: 142 52% 52%;
+    --warning: 35 90% 58%;
+    --danger: 0 72% 62%;
+    --info: 215 85% 64%;
+  }
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: var(--font-sans);
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background-color: hsl(var(--brand) / 0.25);
+  }
+
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+
+  /* Refined scrollbars */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted-foreground) / 0.4) transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--muted-foreground) / 0.35);
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--muted-foreground) / 0.55);
+  }
+}
+
+@layer components {
+  .card-surface {
+    @apply rounded-lg border border-border bg-card text-card-foreground shadow-card;
+  }
+
+  .skeleton {
+    @apply relative overflow-hidden rounded-md bg-muted;
+  }
+  .skeleton::after {
+    @apply absolute inset-0 -translate-x-full animate-shimmer;
+    content: "";
+    background-image: linear-gradient(
+      90deg,
+      transparent,
+      hsl(var(--foreground) / 0.06),
+      transparent
+    );
+  }
+
+  /* Numeric/tabular alignment for tables */
+  .tnum {
+    font-variant-numeric: tabular-nums;
+  }
+}
