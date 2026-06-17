@@ -1,0 +1,13 @@
+| Model             | Best Use                      |
+| ----------------- | ----------------------------- |
+| GPT-5.5           | Enterprise Copilots           |
+| GPT-5.4           | General AI Applications       |
+| Claude Opus 4.8   | Large Codebases               |
+| Claude Sonnet 4.6 | Production Assistants         |
+| Gemini 2.5 Pro    | Multimodal Agents             |
+| Gemini Flash      | High-volume APIs              |
+| Grok 4.3          | Agentic Automation            |
+| DeepSeek V4-Pro   | Cost-sensitive Reasoning      |
+| Llama 4 Behemoth  | Private Enterprise AI         |
+| Qwen 3.6          | Multilingual Applications     |
+| Mistral Magistral | European Compliance Workloads |

@@ -1,0 +1,10 @@
+| Vendor             | SOC2                | ISO27001            | HIPAA               | GDPR                | FedRAMP             |
+| ------------------ | ------------------- | ------------------- | ------------------- | ------------------- | ------------------- |
+| OpenAI             | Yes                 | Yes                 | Enterprise          | Yes                 | Emerging            |
+| Anthropic          | Yes                 | Yes                 | Enterprise          | Yes                 | Moderate            |
+| Google             | Yes                 | Yes                 | Yes                 | Yes                 | High                |
+| Microsoft Azure AI | Yes                 | Yes                 | Yes                 | Yes                 | High                |
+| Amazon Bedrock     | Yes                 | Yes                 | Yes                 | Yes                 | High                |
+| xAI                | Limited Enterprise  | Partial             | No                  | Partial             | No                  |
+| DeepSeek           | Limited             | Limited             | No                  | Regional            | No                  |
+| Meta Open Models   | Self-host dependent | Self-host dependent | Self-host dependent | Self-host dependent | Self-host dependent |

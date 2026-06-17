@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Models Intelligence Dashboard</title>
+<style>
+:root{--bg:#080d1a;--surface:#0f1629;--card:#141e33;--card2:#1a2540;--border:#1e2d4a;--indigo:#6366f1;--il:#818cf8;--cyan:#22d3ee;--em:#10b981;--am:#f59e0b;--rose:#f43f5e;--vi:#a78bfa;--tx:#e2e8f0;--tx2:#94a3b8;--tx3:#64748b}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--tx);font-family:'Segoe UI',system-ui,sans-serif}
+.hdr{background:linear-gradient(135deg,#0f1629,#1a1040,#0f1629);border-bottom:1px solid var(--border);padding:18px 32px;display:flex;align-items:center;justify-content:space-between}
+.hdr h1{font-size:21px;font-weight:700;color:#fff}.hdr h1 span{color:var(--il)}
+.hdr p{font-size:12px;color:var(--tx3);margin-top:3px}
+.badge{background:linear-gradient(135deg,var(--indigo),#7c3aed);color:#fff;font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px}
+.lu{font-size:11px;color:var(--tx3);text-align:right}
+.ms{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--border);border-bottom:1px solid var(--border)}
+.m{background:var(--surface);padding:13px 18px;text-align:center}
+.mv{font-size:24px;font-weight:800;line-height:1}
+.ml{font-size:10px;color:var(--tx3);margin-top:4px;text-transform:uppercase;letter-spacing:.5px}
+.ms2{font-size:10px;color:var(--tx2);margin-top:2px}
+.nav{background:var(--surface);border-bottom:1px solid var(--border);display:flex;padding:0 32px;position:sticky;top:0;z-index:100}
+.nt{padding:13px 20px;font-size:13px;font-weight:500;color:var(--tx3);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap}
+.nt:hover{color:var(--tx)}.nt.active{color:var(--il);border-bottom-color:var(--indigo)}
+.con{padding:26px 32px;max-width:1600px;margin:0 auto}
+.sec{display:none}.sec.active{display:block}
+.sh{margin-bottom:22px}.sh h2{font-size:17px;font-weight:700;color:#fff}.sh p{font-size:13px;color:var(--tx3);margin-top:3px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.g2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.ic{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px}
+.icl{font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:9px}
+.ict{font-size:14px;font-weight:700;color:#fff}
+.ics{font-size:12px;color:var(--tx2);margin-top:4px;line-height:1.5}
+.ica{font-size:11px;margin-top:9px;padding:5px 9px;border-radius:5px}
+.ai{background:rgba(99,102,241,.12);color:var(--il)}
+.ae{background:rgba(16,185,129,.12);color:var(--em)}
+.aa{background:rgba(245,158,11,.12);color:var(--am)}
+.ac{background:rgba(34,211,238,.12);color:var(--cyan)}
+.ar{background:rgba(244,63,94,.12);color:var(--rose)}
+.av{background:rgba(167,139,250,.12);color:var(--vi)}
+.div{height:1px;background:var(--border);margin:26px 0}
+.t{display:inline-block;font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;margin:1px}
+.ta{background:rgba(99,102,241,.15);color:var(--il)}
+.tm{background:rgba(34,211,238,.12);color:var(--cyan)}
+.to{background:rgba(167,139,250,.15);color:var(--vi)}
+.tk{background:rgba(16,185,129,.12);color:#34d399}
+.tf{background:rgba(99,102,241,.15);color:var(--il)}
+.tp{background:rgba(245,158,11,.12);color:var(--am)}
+.ts{background:rgba(167,139,250,.12);color:var(--vi)}
+.te{background:rgba(244,63,94,.15);color:var(--rose)}
+.tz{background:rgba(0,120,212,.15);color:#60a5fa}
+.tn{background:rgba(100,116,139,.15);color:var(--tx3)}
+.tw{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{background:var(--card2);padding:11px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.8px;border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none}
+thead th:hover{color:var(--tx)}
+thead th.sa::after{content:' \2191';color:var(--il)}thead th.sd::after{content:' \2193';color:var(--il)}
+tbody tr{border-bottom:1px solid var(--border);transition:background .15s}
+tbody tr:last-child{border-bottom:none}tbody tr:hover{background:rgba(99,102,241,.04)}
+tbody td{padding:11px 14px;vertical-align:middle}
+.mn{font-weight:600;color:#fff;font-size:13px}.mf{font-size:11px;color:var(--tx3)}
+.ph{color:var(--rose);font-weight:600}.pm{color:var(--am);font-weight:600}.pl{color:var(--em);font-weight:600}.pv{color:var(--cyan);font-weight:500;font-style:italic}.pf{color:var(--vi);font-weight:600}
+.c{font-size:10px;padding:2px 5px;border-radius:3px;font-weight:500}
+.cy{background:rgba(16,185,129,.15);color:var(--em)}.cn{background:rgba(30,41,59,.8);color:var(--tx3)}.cl{background:rgba(245,158,11,.12);color:var(--am)}
+.ctx{font-size:11px;font-weight:700;color:var(--cyan)}.ctxm{color:var(--vi)}
+.fw{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:26px}
+.fi{display:flex;gap:10px;margin-bottom:18px}
+.fin{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px 16px;color:var(--tx);font-size:14px;outline:none;transition:border-color .2s}
+.fin:focus{border-color:var(--indigo)}.fin::placeholder{color:var(--tx3)}
+.fb{background:linear-gradient(135deg,var(--indigo),#7c3aed);color:#fff;border:none;border-radius:10px;padding:13px 22px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
+.fb:hover{opacity:.85}
+.fch{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px}
+.fcp{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:5px 13px;font-size:12px;color:var(--tx2);cursor:pointer;transition:all .15s}
+.fcp:hover{border-color:var(--indigo);color:var(--il)}
+.fres{display:none}.fres.show{display:block}
+.fwin{background:linear-gradient(135deg,rgba(99,102,241,.08),rgba(124,58,237,.08));border:1px solid rgba(99,102,241,.25);border-radius:12px;padding:20px}
+.frk{font-size:11px;color:var(--il);font-weight:600;text-transform:uppercase;letter-spacing:.8px}
+.fmo{font-size:21px;font-weight:800;color:#fff;margin:5px 0}
+.fve{font-size:13px;color:var(--tx2);margin-bottom:11px}
+.fre{font-size:13px;color:var(--tx2);line-height:1.7;background:rgba(0,0,0,.2);border-radius:8px;padding:13px}
+.fal{margin-top:14px}.fall{font-size:11px;color:var(--tx3);margin-bottom:7px;text-transform:uppercase;letter-spacing:.5px}
+.facs{display:flex;gap:9px;flex-wrap:wrap}
+.fac{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 13px}
+.fan{font-size:12px;font-weight:600;color:var(--tx)}.faw{font-size:11px;color:var(--tx3);margin-top:2px}
+.bg{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:26px}
+.bc{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;position:relative;overflow:hidden}
+.bc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.b1::before{background:linear-gradient(90deg,var(--am),#fcd34d)}.b2::before{background:linear-gradient(90deg,var(--tx3),#94a3b8)}.b3::before{background:linear-gradient(90deg,#b45309,var(--am))}.bn::before{background:var(--border)}
+.brk{font-size:26px;font-weight:900;color:var(--tx3);opacity:.4;line-height:1;margin-bottom:9px}
+.b1 .brk{color:var(--am);opacity:1}.b2 .brk{color:var(--tx2);opacity:1}.b3 .brk{color:#b45309;opacity:1}
+.bm{font-size:14px;font-weight:700;color:#fff}
+.cd{width:21px;height:21px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+.cdy{background:rgba(16,185,129,.2);color:var(--em)}.cde{background:rgba(245,158,11,.2);color:var(--am)}.cdn{background:rgba(100,116,139,.1);color:var(--tx3)}.cdp{background:rgba(99,102,241,.15);color:var(--il)}.cds{background:rgba(167,139,250,.15);color:var(--vi)}
+.lg{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.lc{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
+.lh{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.lm{font-size:14px;font-weight:700;color:#fff}.lv{font-size:11px;color:var(--tx3);margin-top:2px}
+.ls{font-size:10px;font-weight:700;padding:3px 7px;border-radius:4px}
+.lac{background:rgba(16,185,129,.15);color:var(--em)}.lex{background:rgba(244,63,94,.15);color:var(--rose)}
+.lbl{display:flex;justify-content:space-between;font-size:10px;color:var(--tx3);margin-bottom:3px}
+.lbb{background:var(--surface);border-radius:4px;height:6px;overflow:hidden;margin:7px 0}
+.lbf{height:100%;border-radius:4px}
+.lmt{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}
+.lb{font-size:10px;padding:2px 7px;border-radius:4px}
+.ug{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.uc{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
+.ucat{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--tx3);margin-bottom:9px}
+.um{font-size:14px;font-weight:700;color:#fff;margin-bottom:3px}
+.uu{font-size:12px;color:var(--il);margin-bottom:9px}
+.ud{font-size:12px;color:var(--tx2);line-height:1.6}
+.va{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:26px}
+.vac{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
+.vh{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px}
+.vn{font-size:14px;font-weight:700}.vco{font-size:20px;font-weight:800}
+.vbb{background:var(--surface);border-radius:4px;height:8px;overflow:hidden;margin-bottom:7px}
+.vbf{height:100%;border-radius:4px}
+.vmo{font-size:11px;color:var(--tx3)}
+.fbtn{display:flex;gap:9px;margin-bottom:16px;flex-wrap:wrap}
+.fb2{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:5px 12px;font-size:12px;color:var(--tx2);cursor:pointer;transition:all .15s}
+.fb2:hover,.fb2.active{background:rgba(99,102,241,.12);border-color:var(--indigo);color:var(--il)}
+.ab{background:rgba(244,63,94,.08);border:1px solid rgba(244,63,94,.25);border-radius:10px;padding:13px 16px;margin-bottom:18px;display:flex;align-items:center;gap:11px}
+.ai2{font-size:17px}.at{font-size:13px;color:var(--tx2)}.at strong{color:var(--rose)}
+.ib{background:rgba(99,102,241,.06);border:1px solid rgba(99,102,241,.2);border-radius:10px;padding:11px 14px;margin-bottom:18px;font-size:12px;color:var(--tx2)}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:var(--surface)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div><h1>AI Models <span>Intelligence Dashboard</span></h1><p>Commercial frontier models &middot; Pricing &middot; Capabilities &middot; Lifecycle &middot; Compliance</p></div>
+  <div style="display:flex;align-items:center;gap:14px"><div class="lu">Last Updated<br><strong style="color:var(--tx2)">June 14, 2026</strong></div><div class="badge">LIVE INTELLIGENCE</div></div>
+</div>
+<div class="ms">
+  <div class="m"><div class="mv" style="color:var(--il)">12</div><div class="ml">Total Models</div><div class="ms2">6 Vendors</div></div>
+  <div class="m"><div class="mv" style="color:var(--em)">9</div><div class="ml">1M+ Context</div><div class="ms2">Models with &ge;1M tokens</div></div>
+  <div class="m"><div class="mv" style="color:var(--cyan)">4</div><div class="ml">Open Source</div><div class="ms2">Freely deployable</div></div>
+  <div class="m"><div class="mv" style="color:var(--am)">$0.0028</div><div class="ml">Lowest Input Cost</div><div class="ms2">per 1M tokens</div></div>
+  <div class="m"><div class="mv" style="color:var(--rose)">1</div><div class="ml">Expiring &le;90d</div><div class="ms2">GPT-5.4</div></div>
+  <div class="m"><div class="mv" style="color:var(--vi)">5</div><div class="ml">Full Multimodal</div><div class="ms2">Vision+Audio+Video</div></div>
+</div>
+<div class="nav">
+  <div class="nt active" onclick="showTab('ov')">&#128202; Overview</div>
+  <div class="nt" onclick="showTab('fi')">&#128269; Model Finder</div>
+  <div class="nt" onclick="showTab('pr')">&#128176; Pricing &amp; Capabilities</div>
+  <div class="nt" onclick="showTab('bm')">&#127942; Benchmarks</div>
+  <div class="nt" onclick="showTab('ce')">&#128737; Certifications</div>
+  <div class="nt" onclick="showTab('lf')">&#128260; Lifecycle</div>
+  <div class="nt" onclick="showTab('uc')">&#128161; Use Cases</div>
+</div>
+<div class="con">
+
+<!-- OVERVIEW -->
+<div id="ov" class="sec active">
+<div class="sh"><h2>At a Glance</h2><p>Key intelligence across all 12 frontier commercial AI models</p></div>
+<div class="ab"><div class="ai2">&#9888;&#65039;</div><div class="at"><strong>Expiring Soon:</strong> GPT-5.4 (OpenAI) is projected to retire within 77 days. Plan migration to GPT-5.5 or Claude Opus 4.8.</div></div>
+<div class="g4" style="margin-bottom:14px">
+  <div class="ic"><div class="icl">&#128184; Lowest Cost Input</div><div class="ict">DeepSeek V4-Flash</div><div class="ics">$0.0028 per 1M input tokens &mdash; over 5,000&times; cheaper than GPT-5.5</div><div class="ica ae">DeepSeek &middot; $0.0028 in / $0.28 out</div></div>
+  <div class="ic"><div class="icl">&#128207; Largest Context</div><div class="ict">Llama 4 Behemoth</div><div class="ics">10M token context window &mdash; process entire codebases or datasets in one pass</div><div class="ica av">Meta &middot; Open Source &middot; Self-hosted</div></div>
+  <div class="ic"><div class="icl">&#128187; Best for Coding</div><div class="ict">Claude Opus 4.8</div><div class="ics">Ranked #2 globally with specific strength in large codebase analysis and agentic coding</div><div class="ica ai">Anthropic &middot; $15 in / $25 out per 1M</div></div>
+  <div class="ic"><div class="icl">&#127760; Best Multimodal</div><div class="ict">Gemini 2.5 Pro</div><div class="ics">Full Vision + Audio + Video + 1M+ context. Ranked #3 benchmark globally</div><div class="ica ac">Google &middot; Variable pricing</div></div>
+</div>
+<div class="g4" style="margin-bottom:26px">
+  <div class="ic"><div class="icl">&#127970; Most Active Vendor</div><div class="ict">OpenAI &amp; Anthropic</div><div class="ics">Both lead with 2 Advanced-tier frontier models each. OpenAI edges on general intelligence benchmarks.</div><div class="ica aa">2 Advanced models each</div></div>
+  <div class="ic"><div class="icl">&#128275; Open Source Leaders</div><div class="ict">4 Models Available</div><div class="ics">Llama 4 Behemoth, DeepSeek V4 (Pro &amp; Flash), Mistral Magistral, Qwen 3.6 &mdash; all self-hostable</div><div class="ica av">No API fees &middot; Data sovereignty</div></div>
+  <div class="ic"><div class="icl">&#9729;&#65039; Available on Azure</div><div class="ict">4 Model Families</div><div class="ics">OpenAI GPT, Anthropic Claude, Meta Llama, and Mistral via Azure OpenAI &amp; AI Foundry</div><div class="ica ai">Azure AI Foundry &amp; Azure OpenAI</div></div>
+  <div class="ic"><div class="icl">&#129302; Best Price/Agentic</div><div class="ict">Grok 4.3</div><div class="ics">Ranked #4 in agentic benchmarks at lowest price among Advanced-tier models ($1.25/$2.50)</div><div class="ica ar">xAI &middot; $1.25 in / $2.50 out</div></div>
+</div>
+<div class="div"></div>
+<div class="sh"><h2>Vendor Frontier Activity</h2><p>Active model count per vendor</p></div>
+<div class="va">
+  <div class="vac"><div class="vh"><div><div class="vn" style="color:#60a5fa">OpenAI</div><div class="vmo">GPT-5.5 &middot; GPT-5.4</div></div><div class="vco" style="color:#60a5fa">2</div></div><div class="vbb"><div class="vbf" style="width:100%;background:linear-gradient(90deg,#3b82f6,#60a5fa)"></div></div></div>
+  <div class="vac"><div class="vh"><div><div class="vn" style="color:#a78bfa">Anthropic</div><div class="vmo">Claude Opus 4.8 &middot; Sonnet 4.6</div></div><div class="vco" style="color:#a78bfa">2</div></div><div class="vbb"><div class="vbf" style="width:100%;background:linear-gradient(90deg,#7c3aed,#a78bfa)"></div></div></div>
+  <div class="vac"><div class="vh"><div><div class="vn" style="color:#34d399">Google</div><div class="vmo">Gemini 2.5 Pro &middot; Flash</div></div><div class="vco" style="color:#34d399">2</div></div><div class="vbb"><div class="vbf" style="width:100%;background:linear-gradient(90deg,#059669,#34d399)"></div></div></div>
+  <div class="vac"><div class="vh"><div><div class="vn" style="color:#fb923c">DeepSeek</div><div class="vmo">V4-Pro &middot; V4-Flash</div></div><div class="vco" style="color:#fb923c">2</div></div><div class="vbb"><div class="vbf" style="width:100%;background:linear-gradient(90deg,#ea580c,#fb923c)"></div></div></div>
+  <div class="vac"><div class="vh"><div><div class="vn" style="color:#f472b6">xAI</div><div class="vmo">Grok 4.3</div></div><div class="vco" style="color:#f472b6">1</div></div><div class="vbb"><div class="vbf" style="width:50%;background:linear-gradient(90deg,#be185d,#f472b6)"></div></div></div>
+  <div class="vac"><div class="vh"><div><div class="vn" style="color:#94a3b8">Meta / Mistral / Alibaba</div><div class="vmo">Llama 4 &middot; Magistral &middot; Qwen 3.6</div></div><div class="vco" style="color:#94a3b8">1 ea</div></div><div class="vbb"><div class="vbf" style="width:50%;background:linear-gradient(90deg,#475569,#94a3b8)"></div></div></div>
+</div>
+<div class="div"></div>
+<div class="sh"><h2>1M+ Context Models</h2><p>9 of 12 models support at least 1 million token context windows</p></div>
+<div class="tw">
+<table>
+<thead><tr><th>Model</th><th>Vendor</th><th>Context</th><th>Input $/1M</th><th>Open Source</th><th>Azure</th><th>Tier</th></tr></thead>
+<tbody>
+<tr><td><div class="mn">Llama 4 Behemoth</div></td><td><span class="t" style="background:rgba(251,146,60,.1);color:#fb923c">Meta</span></td><td><span class="ctx ctxm">10M &#9889;</span></td><td><span class="pf">Self-host</span></td><td><span class="t to">&#10003; Open</span></td><td><span class="t tz">&#10003; Foundry</span></td><td><span class="t tm">Medium</span></td></tr>
+<tr><td><div class="mn">Gemini 2.5 Pro</div></td><td><span class="t" style="background:rgba(52,211,153,.1);color:#34d399">Google</span></td><td><span class="ctx ctxm">1M+ &#9889;</span></td><td><span class="pv">Variable</span></td><td><span class="t tn">No</span></td><td><span class="t tn">GCP Only</span></td><td><span class="t ta">Advanced</span></td></tr>
+<tr><td><div class="mn">Claude Opus 4.8</div></td><td><span class="t" style="background:rgba(167,139,250,.1);color:#a78bfa">Anthropic</span></td><td><span class="ctx">1M</span></td><td><span class="ph">$15.00</span></td><td><span class="t tn">No</span></td><td><span class="t tz">&#10003; Foundry</span></td><td><span class="t ta">Advanced</span></td></tr>
+<tr><td><div class="mn">Claude Sonnet 4.6</div></td><td><span class="t" style="background:rgba(167,139,250,.1);color:#a78bfa">Anthropic</span></td><td><span class="ctx">1M</span></td><td><span class="pm">$3.00</span></td><td><span class="t tn">No</span></td><td><span class="t tz">&#10003; Foundry</span></td><td><span class="t ta">Advanced</span></td></tr>
+<tr><td><div class="mn">Gemini 2.5 Flash</div></td><td><span class="t" style="background:rgba(52,211,153,.1);color:#34d399">Google</span></td><td><span class="ctx">1M</span></td><td><span class="pl">Low Cost</span></td><td><span class="t tn">No</span></td><td><span class="t tn">GCP Only</span></td><td><span class="t tm">Medium</span></td></tr>
+<tr><td><div class="mn">Grok 4.3</div></td><td><span class="t" style="background:rgba(244,114,182,.1);color:#f472b6">xAI</span></td><td><span class="ctx">1M</span></td><td><span class="pl">$1.25</span></td><td><span class="t tn">No</span></td><td><span class="t tn">No</span></td><td><span class="t ta">Advanced</span></td></tr>
+<tr><td><div class="mn">DeepSeek V4-Pro</div></td><td><span class="t" style="background:rgba(251,146,60,.1);color:#fb923c">DeepSeek</span></td><td><span class="ctx">1M</span></td><td><span class="pl">$0.0145</span></td><td><span class="t to">&#10003; Open</span></td><td><span class="t tn">No</span></td><td><span class="t ta">Advanced</span></td></tr>
+<tr><td><div class="mn">DeepSeek V4-Flash</div></td><td><span class="t" style="background:rgba(251,146,60,.1);color:#fb923c">DeepSeek</span></td><td><span class="ctx">1M</span></td><td><span class="pl">$0.0028 &#9889;</span></td><td><span class="t to">&#10003; Open</span></td><td><span class="t tn">No</span></td><td><span class="t tm">Medium</span></td></tr>
+<tr><td><div class="mn">Qwen 3.6 Max</div></td><td><span class="t" style="background:rgba(96,165,250,.1);color:#60a5fa">Alibaba</span></td><td><span class="ctx">1M</span></td><td><span class="pl">Low</span></td><td><span class="t to">&#10003; Open</span></td><td><span class="t tn">No</span></td><td><span class="t tm">Medium</span></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- MODEL FINDER -->
+<div id="fi" class="sec">
+<div class="sh"><h2>AI Model Finder</h2><p>Describe your use case and get an instant recommendation with reasoning</p></div>
+<div class="fw">
+<div class="fi"><input class="fin" id="finIn" type="text" placeholder="e.g. I need a model for coding, cheap API, HIPAA compliant assistant, multimodal pipeline..."/><button class="fb" onclick="findModel()">Find Best Model &#8594;</button></div>
+<div class="fch">
+<div class="fcp" onclick="qf('coding')">&#128187; Coding</div>
+<div class="fcp" onclick="qf('cheap budget cost')">&#128184; Budget / Low Cost</div>
+<div class="fcp" onclick="qf('multimodal vision image video audio')">&#128247; Multimodal</div>
+<div class="fcp" onclick="qf('enterprise HIPAA compliance')">&#127970; Enterprise Compliance</div>
+<div class="fcp" onclick="qf('open source self-host private')">&#128275; Open Source</div>
+<div class="fcp" onclick="qf('long document large context million token')">&#128196; Long Context</div>
+<div class="fcp" onclick="qf('agentic automation workflow')">&#129302; Agentic AI</div>
+<div class="fcp" onclick="qf('multilingual translation language')">&#127760; Multilingual</div>
+<div class="fcp" onclick="qf('european GDPR compliance')">&#127466;&#127482; European / GDPR</div>
+<div class="fcp" onclick="qf('fast speed high volume flash')">&#9889; Speed / High Volume</div>
+<div class="fcp" onclick="qf('reasoning math logic science')">&#129518; Reasoning / Math</div>
+<div class="fcp" onclick="qf('azure microsoft cloud')">&#9729;&#65039; Azure / Microsoft</div>
+</div>
+<div class="fres" id="fres"><div class="fwin" id="fwin"></div></div>
+</div>
+</div>
+
+<!-- PRICING -->
+<div id="pr" class="sec">
+<div class="sh"><h2>Pricing &amp; Capabilities Matrix</h2><p>All 12 models &middot; Click column headers to sort &middot; Use filters to narrow view</p></div>
+<div class="ib">&#128161; Pricing is per 1M tokens. "Self-host" = open source with no API fees (compute cost only). Click any column header to sort.</div>
+<div class="fbtn">
+<div class="fb2 active" onclick="ft('all',this)">All Models</div>
+<div class="fb2" onclick="ft('advanced',this)">Advanced Tier</div>
+<div class="fb2" onclick="ft('1m',this)">1M+ Context</div>
+<div class="fb2" onclick="ft('multimodal',this)">Full Multimodal</div>
+<div class="fb2" onclick="ft('opensource',this)">Open Source</div>
+<div class="fb2" onclick="ft('azure',this)">Azure Available</div>
+</div>
+<div class="tw">
+<table id="pt">
+<thead><tr>
+<th onclick="st(0)">Model</th><th onclick="st(1)">Vendor</th><th onclick="st(2)">Context</th><th onclick="st(3)">Input $/1M</th><th onclick="st(4)">Output $/1M</th>
+<th>Reasoning</th><th>Vision</th><th>Audio</th><th>Video</th><th>Agentic</th><th>Open Source</th><th>Azure</th>
+</tr></thead>
+<tbody id="pb">
+<tr data-tier="advanced" data-ctx="400k" data-mm="yes" data-os="no" data-az="yes">
+<td><div class="mn">GPT-5.5</div><div class="mf">GPT Series</div></td><td><span class="t" style="background:rgba(96,165,250,.1);color:#60a5fa">OpenAI</span></td><td>400K</td><td><span class="ph">$15.00</span></td><td><span class="ph">$30.00</span></td>
+<td><span class="c cy">&#10003;</span></td><td><span class="c cy">&#10003;</span></td><td><span class="c cy">&#10003;</span></td><td><span class="c cy">&#10003;</span></td>
+<td><span class="t ta">Advanced</span></td><td><span class="t tn">No</span></td><td><span class="t tz">&#10003; Azure</span></td>
+</tr>
+<tr data-tier="advanced" data-ctx="400k" data-mm="yes" data-os="no" data-az="yes">
+<td><div class="mn">GPT-5.4 <span class="t te" style="font-size:9px">&#9888; ~77d</span></div><div class="mf">GPT Series</div></td><td><span class="t" style="background:rgba(96,165,250,.1);color:#60a5fa">OpenAI</span></td><td>400K</td><td><span class="ph">$7.50</span></td><td><span class="ph">$15.00</span></td>
+<td><span class="c cy">&#10003;</span></td><td><span class="c cy">&#10003;</span></td><td><span class="c cy">&#10003;</span></td><td><span class="c cy">&#10003;</span></td>
+<td><span class="t ta">Advanced</span></td><td><span class="t tn">No</span></td><td><span class="t tz">&#10003; Azure</span></td>
+</tr>
+<tr data-tier="advanced" data-ctx="1m" data-mm="no" data-os="no" data-az="yes">
+<td><div class="mn">Claude Opus 4.8</div><div class="mf">Claude Series</div></td><td><span class="t" style="background:rgba(167,139,250,.1);color:#a78bfa">Anthropic</span></td><td><span class="ctx">1M</span></td><td><span class="ph">$15.00</span></td><td><span class="ph">$25.00</span></td>
+<td><span class="c cy">&#10003;</span></td><td><span class="c cy">&#10003;</span></td><td><span class="c cl">~Lim</span></td><td><span class="c cn">&#10007;</span></td>
+<td><span class="t ta">Advanced</span></td><td><span class="t tn">No</span></td><td><span class="t tz">&#10003; Foundry</span></td>
+</tr>
+<tr data-tier="advanced" data-ctx="1m" data-mm="no" data-os="no" data-az="yes">
+<td><div class="mn">Claude Sonnet 4.6</div><div class="mf">Claude Series</div></td><td><span class="t" style="background:rgba(167,139,250,.1);color:#a78bfa">Anthropic</span></td><td><span class="ctx">1M</span></td><td><span class="pm">$3.00</span></td><td><span class="ph">$15.00</span></td>
+<td><span class="c cy">&#10003;</span></td><td><span class="c cy">&#10003;</span></td><td><span class="c cl">~Lim</span></td><td><span class="c cn">&#10007;</span></td>
+<td><span class="t ta">Advanced</span></td><td><span class="t tn">No</span></td><td><span class="t tz">&#10003; Foundry</span></td>
+</tr>
+<tr data-tier="advanced" data-ctx="1m" data-mm="yes" data-os="no" data-az="no">
+<td><div class="mn">Gemini 2.5 Pro</div><div class="mf">Gemini Series</div></td><td><span class="t" style="background:rgba(52,211,153,.1);color:#34d399">Google</span></td><td><span class="ctx ctxm">1M+</span></td><td><span class="pv">Variable</span></td><td><span class="pv">Variable</span></td>
+<td><span class="c cy">&#10003;</span></td><td><span class="c cy">&#10003;</span></td><td><span class="c cy">&#10003;</span></td><td><span class="c cy">&#10003;</span></td>
+<td><span class="t ta">Advanced</span></td><td><span class="t tn">No</span></td><td><span class="t tn">GCP Only</span></td>
+</tr>
+<tr data-tier="medium" data-ctx="1m" data-mm="yes" data-os="no" data-az="no">
+<td><div class="mn">Gemini 2.5 Flash</div><div class="mf">Gemini Series</div></td><td><span class="t" style="background:rgba(52,211,153,.1);color:#34d399">Google</span></td><td><span class="ctx">1M</span></td><td><span class="pl">Low Cost</span></td><td><span class="pl">Low Cost</span></td>
+<td><span class="c cy">&#10003;</span></td><td><span class="c cy">&#10003;</span></td><td><span class="c cy">&#10003;</span></td><td><span class="c cy">&#10003;</span></td>
+<td><span class="t tm">Medium</span></td><td><span class="t tn">No</span></td><td><span class="t tn">GCP Only</span></td>
+</tr>
+<tr data-tier="advanced" data-ctx="1m" data-mm="no" data-os="no" data-az="no">
+<td><div class="mn">Grok 4.3</div><div class="mf">Grok Series</div></td><td><span class="t" style="background:rgba(244,114,182,.1);color:#f472b6">xAI</span></td><td><span class="ctx">1M</span></td><td><span class="pl">$1.25</span></td><td><span class="pl">$2.50</span></td>
+<td><span class="c cy">&#10003;</span></td><td><span class="c cy">&#10003;</span></td><td><span class="c cn">&#10007;</span></td><td><span class="c cn">&#10007;</span></td>
+<td><span class="t ta">Advanced</span></td><td><span class="t tn">No</span></td><td><span class="t tn">No</span></td>
+</tr>
+<tr data-tier="advanced" data-ctx="1m" data-mm="no" data-os="yes" data-az="no">
+<td><div class="mn">DeepSeek V4-Pro</div><div class="mf">DeepSeek Series</div></td><td><span class="t" style="background:rgba(251,146,60,.1);color:#fb923c">DeepSeek</span></td><td><span class="ctx">1M</span></td><td><span class="pl">$0.0145</span></td><td><span class="pl">$0.83</span></td>
+<td><span class="c cy">&#10003;</span></td><td><span class="c cl">~Lim</span></td><td><span class="c cn">&#10007;</span></td><td><span class="c cn">&#10007;</span></td>
+<td><span class="t ta">Advanced</span></td><td><span class="t to">&#10003; Open</span></td><td><span class="t tn">No</span></td>
+</tr>
+<tr data-tier="medium" data-ctx="1m" data-mm="no" data-os="yes" data-az="no">
+<td><div class="mn">DeepSeek V4-Flash</div><div class="mf">DeepSeek Series</div></td><td><span class="t" style="background:rgba(251,146,60,.1);color:#fb923c">DeepSeek</span></td><td><span class="ctx">1M</span></td><td><span class="pl">$0.0028 &#9889;</span></td><td><span class="pl">$0.28</span></td>
+<td><span class="c cy">&#10003;</span></td><td><span class="c cl">~Lim</span></td><td><span class="c cn">&#10007;</span></td><td><span class="c cn">&#10007;</span></td>
+<td><span class="t tm">Medium</span></td><td><span class="t to">&#10003; Open</span></td><td><span class="t tn">No</span></td>
+</tr>
+<tr data-tier="medium" data-ctx="1m" data-mm="no" data-os="yes" data-az="yes">
+<td><div class="mn">Llama 4 Behemoth</div><div class="mf">Llama Series</div></td><td><span class="t" style="background:rgba(251,146,60,.1);color:#fb923c">Meta</span></td><td><span class="ctx ctxm">10M</span></td><td><span class="pf">Self-host</span></td><td><span class="pf">Self-host</span></td>
+<td><span class="c cy">&#10003;</span></td><td><span class="c cy">&#10003;</span></td><td><span class="c cn">&#10007;</span></td><td><span class="c cn">&#10007;</span></td>
+<td><span class="t tm">Medium</span></td><td><span class="t to">&#10003; Open</span></td><td><span class="t tz">&#10003; Foundry</span></td>
+</tr>
+<tr data-tier="medium" data-ctx="1m" data-mm="no" data-os="yes" data-az="no">
+<td><div class="mn">Qwen 3.6 Max</div><div class="mf">Qwen Series</div></td><td><span class="t" style="background:rgba(96,165,250,.1);color:#60a5fa">Alibaba</span></td><td><span class="ctx">1M</span></td><td><span class="pl">Low</span></td><td><span class="pl">Low</span></td>
+<td><span class="c cy">&#10003;</span></td><td><span class="c cy">&#10003;</span></td><td><span class="c cn">&#10007;</span></td><td><span class="c cn">&#10007;</span></td>
+<td><span class="t tm">Medium</span></td><td><span class="t to">&#10003; Open</span></td><td><span class="t tn">No</span></td>
+</tr>
+<tr data-tier="medium" data-ctx="256k" data-mm="no" data-os="yes" data-az="yes">
+<td><div class="mn">Mistral Magistral Large</div><div class="mf">Mistral Series</div></td><td><span class="t" style="background:rgba(148,163,184,.1);color:#94a3b8">Mistral AI</span></td><td>256K</td><td><span class="pv">Medium</span></td><td><span class="pv">Medium</span></td>
+<td><span class="c cy">&#10003;</span></td><td><span class="c cy">&#10003;</span></td><td><span class="c cn">&#10007;</span></td><td><span class="c cn">&#10007;</span></td>
+<td><span class="t tm">Medium</span></td><td><span class="t to">&#10003; Open</span></td><td><span class="t tz">&#10003; Foundry</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- BENCHMARKS -->
+<div id="bm" class="sec">
+<div class="sh"><h2>Benchmark Leaders</h2><p>Global rankings across major AI evaluation frameworks</p></div>
+<div class="bg">
+<div class="bc b1"><div class="brk">&#127945;</div><div class="bm">GPT-5.5</div><div style="font-size:12px;color:var(--tx3);margin:4px 0 8px">OpenAI &middot; 400K ctx</div><div class="t tp" style="margin-bottom:9px">&#9889; General Intelligence</div><div style="font-size:12px;color:var(--tx2);line-height:1.6">Leads on MMLU, HumanEval, and composite scores. Full multimodal. Premier choice for enterprise copilots requiring broad domain knowledge.</div></div>
+<div class="bc b2"><div class="brk">&#127946;</div><div class="bm">Claude Opus 4.8</div><div style="font-size:12px;color:var(--tx3);margin:4px 0 8px">Anthropic &middot; 1M ctx</div><div class="t ta" style="margin-bottom:9px">&#128187; Coding</div><div style="font-size:12px;color:var(--tx2);line-height:1.6">Top ranked for SWE-bench, code generation, and large codebase navigation. Gold standard for developer tooling and AI coding agents.</div></div>
+<div class="bc b3"><div class="brk">&#127947;</div><div class="bm">Gemini 2.5 Pro</div><div style="font-size:12px;color:var(--tx3);margin:4px 0 8px">Google &middot; 1M+ ctx</div><div class="t tm" style="margin-bottom:9px">&#127760; Multimodal</div><div style="font-size:12px;color:var(--tx2);line-height:1.6">Leads in cross-modal tasks: image-to-code, video understanding, audio transcription. Best for multimodal agentic pipelines.</div></div>
+<div class="bc bn"><div class="brk" style="font-size:18px;opacity:.6">#4</div><div class="bm">Grok 4.3</div><div style="font-size:12px;color:var(--tx3);margin:4px 0 8px">xAI &middot; 1M ctx</div><div class="t" style="background:rgba(244,63,94,.12);color:var(--rose);margin-bottom:9px">&#129302; Agentic Workflows</div><div style="font-size:12px;color:var(--tx2);line-height:1.6">Highest agentic benchmark scores at the lowest price among Advanced-tier. Best value for autonomous agent deployments.</div></div>
+<div class="bc bn"><div class="brk" style="font-size:18px;opacity:.6">#5</div><div class="bm">DeepSeek V4-Pro</div><div style="font-size:12px;color:var(--tx3);margin:4px 0 8px">DeepSeek &middot; 1M ctx</div><div class="t tk" style="margin-bottom:9px">&#128176; Cost Efficiency</div><div style="font-size:12px;color:var(--tx2);line-height:1.6">Frontier-class reasoning at a fraction of the cost. Best performance-per-dollar among all advanced reasoning models.</div></div>
+<div class="bc bn"><div class="brk" style="font-size:18px;opacity:.6">#6</div><div class="bm">Llama 4 Behemoth</div><div style="font-size:12px;color:var(--tx3);margin:4px 0 8px">Meta &middot; 10M ctx</div><div class="t to" style="margin-bottom:9px">&#127981; Open Source Enterprise</div><div style="font-size:12px;color:var(--tx2);line-height:1.6">Best open-source model with 10M context. Ideal for private deployment where data sovereignty and cost control are critical.</div></div>
+<div class="bc bn"><div class="brk" style="font-size:18px;opacity:.6">#7</div><div class="bm">Qwen 3.6 Max</div><div style="font-size:12px;color:var(--tx3);margin:4px 0 8px">Alibaba &middot; 1M ctx</div><div class="t tm" style="margin-bottom:9px">&#127760; Multilingual</div><div style="font-size:12px;color:var(--tx2);line-height:1.6">Leads multilingual benchmarks across 50+ languages. Best choice for Asian market applications and cross-language products.</div></div>
+<div class="bc bn"><div class="brk" style="font-size:18px;opacity:.6">#8</div><div class="bm">Mistral Magistral Large</div><div style="font-size:12px;color:var(--tx3);margin:4px 0 8px">Mistral AI &middot; 256K ctx</div><div class="t" style="background:rgba(148,163,184,.12);color:#94a3b8;margin-bottom:9px">&#127466;&#127482; European Enterprise</div><div style="font-size:12px;color:var(--tx2);line-height:1.6">Best-in-class for EU compliance workloads. French-headquartered, GDPR-native, optimized for European regulatory environments.</div></div>
+</div>
+</div>
+
+<!-- CERTIFICATIONS -->
+<div id="ce" class="sec">
+<div class="sh"><h2>Compliance &amp; Certification Matrix</h2><p>Enterprise security and regulatory coverage per vendor platform</p></div>
+<div class="ib">&#128737; <strong style="color:var(--tx)">E</strong> = Enterprise plan/BAA required &nbsp;&middot;&nbsp; <strong style="color:var(--am)">~</strong> = Partial/In Progress &nbsp;&middot;&nbsp; <strong style="color:var(--vi)">S</strong> = Self-host dependent</div>
+<div class="tw" style="margin-bottom:22px">
+<table>
+<thead><tr><th>Vendor / Platform</th><th>SOC 2 Type II</th><th>ISO 27001</th><th>HIPAA</th><th>GDPR</th><th>FedRAMP</th><th>Models Hosted</th></tr></thead>
+<tbody>
+<tr><td><strong style="color:#60a5fa">OpenAI</strong></td><td><span class="cd cdy">&#10003;</span></td><td><span class="cd cdy">&#10003;</span></td><td><span class="cd cde">E</span></td><td><span class="cd cdy">&#10003;</span></td><td><span class="cd cdp">~</span></td><td style="color:var(--tx2);font-size:12px">GPT-5.5, GPT-5.4</td></tr>
+<tr><td><strong style="color:#a78bfa">Anthropic</strong></td><td><span class="cd cdy">&#10003;</span></td><td><span class="cd cdy">&#10003;</span></td><td><span class="cd cde">E</span></td><td><span class="cd cdy">&#10003;</span></td><td><span class="cd cdp">~</span></td><td style="color:var(--tx2);font-size:12px">Claude Opus 4.8, Sonnet 4.6</td></tr>
+<tr><td><strong style="color:#34d399">Google</strong></td><td><span class="cd cdy">&#10003;</span></td><td><span class="cd cdy">&#10003;</span></td><td><span class="cd cdy">&#10003;</span></td><td><span class="cd cdy">&#10003;</span></td><td><span class="cd cdy">&#10003;</span></td><td style="color:var(--tx2);font-size:12px">Gemini 2.5 Pro, Flash</td></tr>
+<tr><td><strong style="color:#60a5fa">Microsoft Azure AI</strong></td><td><span class="cd cdy">&#10003;</span></td><td><span class="cd cdy">&#10003;</span></td><td><span class="cd cdy">&#10003;</span></td><td><span class="cd cdy">&#10003;</span></td><td><span class="cd cdy">&#10003;</span></td><td style="color:var(--tx2);font-size:12px">GPT, Claude, Llama, Mistral</td></tr>
+<tr><td><strong style="color:#fb923c">Amazon Bedrock</strong></td><td><span class="cd cdy">&#10003;</span></td><td><span class="cd cdy">&#10003;</span></td><td><span class="cd cdy">&#10003;</span></td><td><span class="cd cdy">&#10003;</span></td><td><span class="cd cdy">&#10003;</span></td><td style="color:var(--tx2);font-size:12px">Claude, Llama, Mistral</td></tr>
+<tr><td><strong style="color:#f472b6">xAI</strong></td><td><span class="cd cdp">~</span></td><td><span class="cd cdp">~</span></td><td><span class="cd cdn">&#10007;</span></td><td><span class="cd cdp">~</span></td><td><span class="cd cdn">&#10007;</span></td><td style="color:var(--tx2);font-size:12px">Grok 4.3</td></tr>
+<tr><td><strong style="color:#fb923c">DeepSeek</strong></td><td><span class="cd cdp">~</span></td><td><span class="cd cdp">~</span></td><td><span class="cd cdn">&#10007;</span></td><td><span class="cd cdp">~</span></td><td><span class="cd cdn">&#10007;</span></td><td style="color:var(--tx2);font-size:12px">V4-Pro, V4-Flash</td></tr>
+<tr><td><strong style="color:#94a3b8">Meta Open Models</strong></td><td><span class="cd cds">S</span></td><td><span class="cd cds">S</span></td><td><span class="cd cds">S</span></td><td><span class="cd cds">S</span></td><td><span class="cd cds">S</span></td><td style="color:var(--tx2);font-size:12px">Llama 4 Behemoth</td></tr>
+</tbody>
+</table>
+</div>
+<div style="display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--tx3);margin-bottom:22px">
+<span><span class="cd cdy" style="font-size:9px;width:18px;height:18px">&#10003;</span> Certified</span>
+<span><span class="cd cde" style="font-size:9px;width:18px;height:18px">E</span> Enterprise Plan</span>
+<span><span class="cd cdp" style="font-size:9px;width:18px;height:18px">~</span> Partial</span>
+<span><span class="cd cdn" style="font-size:9px;width:18px;height:18px">&#10007;</span> Not Certified</span>
+<span><span class="cd cds" style="font-size:9px;width:18px;height:18px">S</span> Self-host</span>
+</div>
+<div class="g3">
+<div class="ic"><div class="icl">&#127973; HIPAA Requirements</div><div class="ict">Google, Azure, or AWS Bedrock</div><div class="ics">Only these three platforms offer full HIPAA without enterprise restrictions. OpenAI and Anthropic require enterprise BAA agreements.</div></div>
+<div class="ic"><div class="icl">&#127963; FedRAMP / Government</div><div class="ict">Google, Azure AI, or AWS Bedrock</div><div class="ics">Only Google Cloud AI, Microsoft Azure AI, and Amazon Bedrock hold High FedRAMP authorization for US federal deployments.</div></div>
+<div class="ic"><div class="icl">&#127466;&#127482; GDPR / European Compliance</div><div class="ict">Mistral Magistral Large</div><div class="ics">France-headquartered, GDPR-by-design, zero transatlantic data transfer risk. Also: Anthropic, Google, and Azure all hold full GDPR compliance.</div></div>
+</div>
+</div>
+
+<!-- LIFECYCLE -->
+<div id="lf" class="sec">
+<div class="sh"><h2>Model Lifecycle Status</h2><p>Age, retirement timeline, and classification &middot; Reference date: June 14, 2026</p></div>
+<div class="ab"><div class="ai2">&#9888;&#65039;</div><div class="at"><strong>GPT-5.4 projected to retire in ~77 days</strong> (est. August 30, 2026). Begin migrating workloads to GPT-5.5 or Claude Opus 4.8 now.</div></div>
+<div class="lg">
+<div class="lc" style="border-color:rgba(244,63,94,.35)">
+<div class="lh"><div><div class="lm">GPT-5.4</div><div class="lv">OpenAI &middot; GPT Series</div></div><div class="ls lex">&#9888; EXPIRING</div></div>
+<div class="lbl"><span>Age: 300 days</span><span style="color:var(--rose)">77 days left</span></div>
+<div class="lbb"><div class="lbf" style="width:80%;background:linear-gradient(90deg,var(--rose),#fb923c)"></div></div>
+<div class="lmt"><div class="lb" style="background:rgba(244,63,94,.1);color:var(--rose)">Retire: ~Aug 2026</div><div class="lb tp">Premium</div><div class="lb tf">Frontier</div></div>
+</div>
+<div class="lc">
+<div class="lh"><div><div class="lm">GPT-5.5</div><div class="lv">OpenAI &middot; GPT Series</div></div><div class="ls lac">&#10003; ACTIVE</div></div>
+<div class="lbl"><span>Age: 120 days</span><span>~366 days left</span></div>
+<div class="lbb"><div class="lbf" style="width:25%;background:linear-gradient(90deg,var(--em),var(--cyan))"></div></div>
+<div class="lmt"><div class="lb" style="background:rgba(16,185,129,.1);color:var(--em)">Est. Retire: Jun 2027</div><div class="lb tp">Premium</div><div class="lb tf">Frontier</div></div>
+</div>
+<div class="lc">
+<div class="lh"><div><div class="lm">Claude Opus 4.8</div><div class="lv">Anthropic &middot; Claude Series</div></div><div class="ls lac">&#10003; ACTIVE</div></div>
+<div class="lbl"><span>Age: 105 days</span><span>~270 days left</span></div>
+<div class="lbb"><div class="lbf" style="width:28%;background:linear-gradient(90deg,var(--indigo),var(--vi))"></div></div>
+<div class="lmt"><div class="lb" style="background:rgba(16,185,129,.1);color:var(--em)">Est. Retire: Mar 2027</div><div class="lb tp">Premium</div><div class="lb tf">Frontier</div></div>
+</div>
+<div class="lc">
+<div class="lh"><div><div class="lm">Claude Sonnet 4.6</div><div class="lv">Anthropic &middot; Claude Series</div></div><div class="ls lac">&#10003; ACTIVE</div></div>
+<div class="lbl"><span>Age: 75 days</span><span>~305 days left</span></div>
+<div class="lbb"><div class="lbf" style="width:20%;background:linear-gradient(90deg,var(--indigo),var(--cyan))"></div></div>
+<div class="lmt"><div class="lb" style="background:rgba(16,185,129,.1);color:var(--em)">Est. Retire: Apr 2027</div><div class="lb" style="background:rgba(245,158,11,.1);color:var(--am)">Standard</div><div class="lb tf">Frontier</div></div>
+</div>
+<div class="lc">
+<div class="lh"><div><div class="lm">Gemini 2.5 Pro</div><div class="lv">Google &middot; Gemini Series</div></div><div class="ls lac">&#10003; ACTIVE</div></div>
+<div class="lbl"><span>Age: 165 days</span><span>~200 days left</span></div>
+<div class="lbb"><div class="lbf" style="width:45%;background:linear-gradient(90deg,#059669,var(--cyan))"></div></div>
+<div class="lmt"><div class="lb" style="background:rgba(16,185,129,.1);color:var(--em)">Est. Retire: Jan 2027</div><div class="lb tp">Premium</div><div class="lb tf">Frontier</div></div>
+</div>
+<div class="lc">
+<div class="lh"><div><div class="lm">Gemini 2.5 Flash</div><div class="lv">Google &middot; Gemini Series</div></div><div class="ls lac">&#10003; ACTIVE</div></div>
+<div class="lbl"><span>Age: 120 days</span><span>~250 days left</span></div>
+<div class="lbb"><div class="lbf" style="width:32%;background:linear-gradient(90deg,#059669,#34d399)"></div></div>
+<div class="lmt"><div class="lb" style="background:rgba(16,185,129,.1);color:var(--em)">Est. Retire: Feb 2027</div><div class="lb tk">Low Cost</div><div class="lb tf">Frontier</div></div>
+</div>
+<div class="lc">
+<div class="lh"><div><div class="lm">Grok 4.3</div><div class="lv">xAI &middot; Grok Series</div></div><div class="ls lac">&#10003; ACTIVE</div></div>
+<div class="lbl"><span>Age: 45 days</span><span>365+ days left</span></div>
+<div class="lbb"><div class="lbf" style="width:11%;background:linear-gradient(90deg,#be185d,#f472b6)"></div></div>
+<div class="lmt"><div class="lb" style="background:rgba(16,185,129,.1);color:var(--em)">Est. Retire: 2027+</div><div class="lb tp">Premium</div><div class="lb tf">Frontier</div></div>
+</div>
+<div class="lc">
+<div class="lh"><div><div class="lm">DeepSeek V4-Pro</div><div class="lv">DeepSeek</div></div><div class="ls lac">&#10003; ACTIVE</div></div>
+<div class="lbl"><span>Age: 165 days</span><span>~200 days left</span></div>
+<div class="lbb"><div class="lbf" style="width:45%;background:linear-gradient(90deg,#ea580c,#fb923c)"></div></div>
+<div class="lmt"><div class="lb" style="background:rgba(16,185,129,.1);color:var(--em)">Est. Retire: Jan 2027</div><div class="lb tk">Low Cost</div><div class="lb to">Open Source</div></div>
+</div>
+<div class="lc">
+<div class="lh"><div><div class="lm">DeepSeek V4-Flash</div><div class="lv">DeepSeek</div></div><div class="ls lac">&#10003; ACTIVE</div></div>
+<div class="lbl"><span>Age: 120 days</span><span>~365 days left</span></div>
+<div class="lbb"><div class="lbf" style="width:25%;background:linear-gradient(90deg,#ea580c,#fbbf24)"></div></div>
+<div class="lmt"><div class="lb" style="background:rgba(16,185,129,.1);color:var(--em)">Est. Retire: Jun 2027</div><div class="lb tk">Low Cost</div><div class="lb to">Open Source</div></div>
+</div>
+<div class="lc">
+<div class="lh"><div><div class="lm">Llama 4 Behemoth</div><div class="lv">Meta &middot; Llama Series</div></div><div class="ls lac">&#10003; ACTIVE</div></div>
+<div class="lbl"><span>Age: 60 days</span><span>No formal EOL</span></div>
+<div class="lbb"><div class="lbf" style="width:14%;background:linear-gradient(90deg,#7c3aed,#a78bfa)"></div></div>
+<div class="lmt"><div class="lb" style="background:rgba(167,139,250,.1);color:var(--vi)">No Formal Retire Date</div><div class="lb ts">Self-host</div><div class="lb to">Open Source</div></div>
+</div>
+<div class="lc">
+<div class="lh"><div><div class="lm">Qwen 3.6 Max</div><div class="lv">Alibaba &middot; Qwen Series</div></div><div class="ls lac">&#10003; ACTIVE</div></div>
+<div class="lbl"><span>Age: 90 days</span><span>~365 days left</span></div>
+<div class="lbb"><div class="lbf" style="width:20%;background:linear-gradient(90deg,#1d4ed8,#60a5fa)"></div></div>
+<div class="lmt"><div class="lb" style="background:rgba(16,185,129,.1);color:var(--em)">Est. Retire: Jun 2027</div><div class="lb tk">Low Cost</div><div class="lb to">Open Source</div></div>
+</div>
+<div class="lc">
+<div class="lh"><div><div class="lm">Mistral Magistral Large</div><div class="lv">Mistral AI</div></div><div class="ls lac">&#10003; ACTIVE</div></div>
+<div class="lbl"><span>Age: 90 days</span><span>~365 days left</span></div>
+<div class="lbb"><div class="lbf" style="width:20%;background:linear-gradient(90deg,#475569,#94a3b8)"></div></div>
+<div class="lmt"><div class="lb" style="background:rgba(16,185,129,.1);color:var(--em)">Est. Retire: Jun 2027</div><div class="lb" style="background:rgba(100,116,139,.1);color:#94a3b8">Medium Cost</div><div class="lb to">Open Source</div></div>
+</div>
+</div>
+</div>
+
+<!-- USE CASES -->
+<div id="uc" class="sec">
+<div class="sh"><h2>Models by Category &amp; Best Use Cases</h2><p>Recommended model per category with detailed justification</p></div>
+<div class="ug">
+<div class="uc" style="border-top:2px solid var(--indigo)"><div class="ucat">&#128187; Coding &amp; Developer Tools</div><div class="um">Claude Opus 4.8</div><div class="uu">Large Codebases &middot; SWE Agents &middot; Code Review</div><div class="ud">Leads SWE-bench evaluations. 1M context for navigating entire codebases. Advanced agentic capabilities. Ideal for IDE integrations, code review pipelines, and multi-file refactoring agents.</div></div>
+<div class="uc" style="border-top:2px solid var(--am)"><div class="ucat">&#127970; Enterprise Copilots</div><div class="um">GPT-5.5</div><div class="uu">Workplace AI &middot; Decision Support &middot; Document Intelligence</div><div class="ud">Ranked #1 on general intelligence benchmarks. Deep Microsoft 365 integration via Azure OpenAI. Best for CRM, ERP, and knowledge management AI requiring broad domain expertise.</div></div>
+<div class="uc" style="border-top:2px solid var(--cyan)"><div class="ucat">&#127760; Multimodal Agents</div><div class="um">Gemini 2.5 Pro</div><div class="uu">Video Analysis &middot; Image-to-Code &middot; Audio AI &middot; Cross-modal</div><div class="ud">Only Advanced-tier model with full Vision+Audio+Video+1M+ context. Best for media analysis, content moderation, visual QA, and multimodal pipelines.</div></div>
+<div class="uc" style="border-top:2px solid var(--rose)"><div class="ucat">&#128176; Budget &amp; High-Volume APIs</div><div class="um">DeepSeek V4-Flash</div><div class="uu">Batch Processing &middot; Classification &middot; Summarization &middot; RAG</div><div class="ud">$0.0028 per 1M input tokens &mdash; 5,000&times; cheaper than GPT-5.5. Frontier reasoning at commodity cost. Best for high-volume inference, document classification, and RAG systems on tight budgets.</div></div>
+<div class="uc" style="border-top:2px solid var(--vi)"><div class="ucat">&#127981; Private Enterprise / Self-hosted</div><div class="um">Llama 4 Behemoth</div><div class="uu">Air-gapped Deployment &middot; Data Sovereignty &middot; Private LLM</div><div class="ud">10M token context with fully open weights. Deploy in your own VPC or on-premises. No recurring API cost. Ideal for defense, healthcare, and legal industries requiring complete data sovereignty.</div></div>
+<div class="uc" style="border-top:2px solid var(--em)"><div class="ucat">&#129302; Agentic Automation</div><div class="um">Grok 4.3</div><div class="uu">Autonomous Agents &middot; Tool Use &middot; Multi-step Workflows</div><div class="ud">Ranked #4 globally on agentic benchmarks at $1.25/$2.50 per 1M &mdash; best price/performance among Advanced-tier for agentic tasks. Ideal for workflow automation and agent frameworks.</div></div>
+<div class="uc" style="border-top:2px solid #60a5fa"><div class="ucat">&#127760; Multilingual Applications</div><div class="um">Qwen 3.6 Max</div><div class="uu">Asian Markets &middot; Translation &middot; Cross-language Search</div><div class="ud">Leads multilingual benchmarks across 50+ languages, excelling in Chinese, Japanese, Korean, and Southeast Asian languages. Open source, 1M context, low cost.</div></div>
+<div class="uc" style="border-top:2px solid #94a3b8"><div class="ucat">&#127466;&#127482; European Compliance Workloads</div><div class="um">Mistral Magistral Large</div><div class="uu">GDPR-native AI &middot; EU Regulatory &middot; European Language</div><div class="ud">France-headquartered, GDPR by design, no transatlantic data transfer risk. Available on Azure AI Foundry. Ideal for EU financial services, public sector, and European-language applications.</div></div>
+<div class="uc" style="border-top:2px solid var(--am)"><div class="ucat">&#9889; Production Assistants</div><div class="um">Claude Sonnet 4.6</div><div class="uu">Customer Service &middot; Knowledge Bases &middot; Real-time Q&amp;A</div><div class="ud">Best balance of capability, safety, and cost at $3/$15 per 1M with 1M context. Anthropic safety tuning makes it ideal for customer-facing production deployments with reliable instruction-following.</div></div>
+<div class="uc" style="border-top:2px solid #fb923c"><div class="ucat">&#129518; Cost-sensitive Reasoning</div><div class="um">DeepSeek V4-Pro</div><div class="uu">Math &middot; Scientific Reasoning &middot; Research Automation</div><div class="ud">Frontier reasoning at $0.0145/$0.83 per 1M &mdash; 1/1000th the cost of GPT-5.5 for equivalent reasoning. Best for research automation, mathematical problem solving, and academic AI on tight budgets.</div></div>
+<div class="uc" style="border-top:2px solid #34d399"><div class="ucat">&#128225; High-Volume Real-time APIs</div><div class="um">Gemini 2.5 Flash</div><div class="uu">Real-time APIs &middot; Low Latency &middot; Throughput-critical Systems</div><div class="ud">Engineered for high-throughput, low-latency production use. Full multimodal at low cost. Unmatched for real-time consumer APIs, mobile AI features, and content processing pipelines.</div></div>
+<div class="uc" style="border-top:2px solid var(--rose)"><div class="ucat">&#127959; General AI Applications</div><div class="um">GPT-5.4 <span class="t te" style="font-size:9px">&#9888; Expiring</span></div><div class="uu">General-purpose AI &middot; Diverse Tasks</div><div class="ud">Strong at $7.50/$15 per 1M with full multimodal. &#9888;&#65039; Projected to retire in ~77 days. Suitable for existing integrations, but begin planning migration to GPT-5.5 or Claude Opus 4.8 now.</div></div>
+</div>
+</div>
+
+</div>
+
+<script>
+function showTab(id){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nt').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const tabs=['ov','fi','pr','bm','ce','lf','uc'];
+  document.querySelectorAll('.nt')[tabs.indexOf(id)].classList.add('active');
+}
+function ft(f,btn){
+  document.querySelectorAll('.fb2').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('#pb tr').forEach(row=>{
+    let show=true;
+    if(f==='advanced') show=row.dataset.tier==='advanced';
+    else if(f==='1m') show=['1m','10m'].includes(row.dataset.ctx)||row.dataset.ctx==='1m+';
+    else if(f==='multimodal') show=row.dataset.mm==='yes';
+    else if(f==='opensource') show=row.dataset.os==='yes';
+    else if(f==='azure') show=row.dataset.az==='yes';
+    row.style.display=show?'':'none';
+  });
+}
+let sd={};
+function st(col){
+  const tbody=document.getElementById('pb');
+  const rows=Array.from(tbody.querySelectorAll('tr'));
+  const dir=sd[col]==='asc'?'desc':'asc'; sd[col]=dir;
+  document.querySelectorAll('#pt thead th').forEach((th,i)=>{th.classList.remove('sa','sd');if(i===col)th.classList.add(dir==='asc'?'sa':'sd');});
+  rows.sort((a,b)=>{const at=a.cells[col]?.innerText?.trim()||'',bt=b.cells[col]?.innerText?.trim()||'';return dir==='asc'?at.localeCompare(bt):bt.localeCompare(at);});
+  rows.forEach(r=>tbody.appendChild(r));
+}
+const md=[
+  {name:'Claude Opus 4.8',vendor:'Anthropic',keys:['coding','code','programming','developer','codebase','swe','refactor','debug','software','technical','repository'],reason:'Claude Opus 4.8 is ranked #2 globally with a specific strength in coding. 1M context for navigating entire codebases, advanced agentic capabilities, available on Azure AI Foundry. Top performer on SWE-bench for large-scale software engineering.',alts:[{name:'GPT-5.5',why:'#1 general intelligence, strong coder'},{name:'Grok 4.3',why:'Advanced agentic, budget-friendly'}]},
+  {name:'DeepSeek V4-Flash',vendor:'DeepSeek',keys:['cheap','budget','cost','affordable','low price','economy','inexpensive','save','volume','batch','bulk','mass','high volume'],reason:'DeepSeek V4-Flash offers frontier reasoning at $0.0028 per 1M input tokens — the lowest cost of any model in this dataset. Over 5,000x cheaper than GPT-5.5. 1M context, reasoning capabilities, open source. Undisputed choice for cost-sensitive workloads.',alts:[{name:'DeepSeek V4-Pro',why:'Stronger, still ultra-cheap'},{name:'Gemini 2.5 Flash',why:'Low cost + full multimodal'}]},
+  {name:'Gemini 2.5 Pro',vendor:'Google',keys:['multimodal','vision','image','video','audio','photo','picture','camera','media','visual','ocr','speech','sound'],reason:'Gemini 2.5 Pro is the only Advanced-tier model supporting all four modalities (Vision, Audio, Video, Text) with 1M+ context. Ranked #3 in benchmarks with specific strength in multimodal tasks. Best for image-to-code, video understanding, audio transcription, and cross-modal pipelines.',alts:[{name:'GPT-5.5',why:'Also full multimodal'},{name:'Gemini 2.5 Flash',why:'Same multimodal, lower cost'}]},
+  {name:'Claude Sonnet 4.6 (via Azure/Google Cloud)',vendor:'Anthropic / Google',keys:['hipaa','fedramp','government','federal','healthcare','medical','health','compliance','regulated','phi','ehr','hospital'],reason:'For HIPAA-regulated workloads, Google Cloud (Gemini 2.5 Pro), Microsoft Azure AI, and Amazon Bedrock offer full HIPAA certification. Claude Sonnet 4.6 via Azure or Bedrock qualifies with an enterprise BAA. Google Cloud provides the cleanest compliance path with no enterprise restrictions.',alts:[{name:'Gemini 2.5 Pro',why:'Full HIPAA on Google Cloud'},{name:'Claude Sonnet 4.6',why:'Enterprise plan includes BAA'}]},
+  {name:'Llama 4 Behemoth',vendor:'Meta',keys:['open source','self-host','private','on-premise','air-gap','data sovereignty','vpc','local','own infrastructure','no api','free','self deploy'],reason:'Llama 4 Behemoth is the only frontier model with full open weights, 10M context, and no per-token API fees. Deploy in your own VPC or on-premises with zero data exposure. Available on Azure AI Foundry. Ideal for defense, healthcare, and legal industries requiring complete data sovereignty.',alts:[{name:'DeepSeek V4-Pro',why:'Also open source, frontier reasoning'},{name:'Mistral Magistral',why:'European open source option'}]},
+  {name:'Llama 4 Behemoth',vendor:'Meta',keys:['long context','large document','million token','10m','entire book','full codebase','long file','big context','entire dataset'],reason:'Llama 4 Behemoth supports a 10M token context window — 10x more than any other model in this dataset. Process entire codebases, books, legal documents, or datasets in a single pass. Open source and self-hostable for cost-effective large-context workloads.',alts:[{name:'Claude Opus 4.8',why:'1M context, strongest coding'},{name:'Gemini 2.5 Pro',why:'1M+ context, full multimodal'}]},
+  {name:'Grok 4.3',vendor:'xAI',keys:['agentic','automation','agent','workflow','autonomous','tool use','orchestration','multi-step','pipeline','rpa','robotic'],reason:'Grok 4.3 ranks #4 on agentic workflow benchmarks — highest among models priced below $5 per 1M. At $1.25/$2.50 with 1M context and Advanced agentic classification, it delivers the best price-performance ratio for autonomous agent deployments.',alts:[{name:'Claude Opus 4.8',why:'#1 agentic with coding strength'},{name:'GPT-5.5',why:'Highest general intelligence'}]},
+  {name:'Qwen 3.6 Max',vendor:'Alibaba',keys:['multilingual','chinese','japanese','korean','language','translation','global','asian','mandarin','international','hindi','arabic'],reason:'Qwen 3.6 Max leads multilingual benchmarks across 50+ languages, excelling in Chinese, Japanese, Korean, and Southeast Asian languages. Open source, 1M context, low cost. Best for global consumer apps and Asian market AI deployment.',alts:[{name:'GPT-5.5',why:'Strong multilingual, broader reasoning'},{name:'Mistral Magistral',why:'Best for European languages'}]},
+  {name:'Mistral Magistral Large',vendor:'Mistral AI',keys:['european','gdpr','france','eu','regulation','data protection','privacy law','european enterprise','continent','french'],reason:'Mistral Magistral Large is headquartered in France, GDPR-native by design, eliminating transatlantic data transfer risk. Available on Azure AI Foundry. Clear choice for EU financial services, public sector, and organizations needing EU-jurisdiction AI with regulatory compliance baked in.',alts:[{name:'Claude Sonnet 4.6',why:'Full GDPR on Anthropic EU endpoints'},{name:'Gemini 2.5 Pro',why:'Google GDPR-compliant GCP'}]},
+  {name:'Gemini 2.5 Flash',vendor:'Google',keys:['fast','speed','latency','flash','real-time','realtime','throughput','high volume','rapid','quick','instant','low latency'],reason:'Gemini 2.5 Flash is engineered for high-throughput, low-latency production workloads. Full multimodal (Vision+Audio+Video+Text) at low cost. Unmatched for real-time consumer APIs, mobile AI features, and content processing pipelines requiring speed at scale.',alts:[{name:'DeepSeek V4-Flash',why:'Cheapest option, fast reasoning'},{name:'Claude Sonnet 4.6',why:'Fast + reliable for production'}]},
+  {name:'GPT-5.5',vendor:'OpenAI',keys:['reasoning','math','logic','science','analysis','problem solving','complex','calculation','formula','equation','academic','research','intelligence'],reason:'GPT-5.5 is ranked #1 globally on intelligence benchmarks including MMLU, GPQA, and complex reasoning. Full multimodal support, 400K context, deep tool-use ecosystem. Gold standard for tasks requiring advanced analytical reasoning across math, science, and complex domains.',alts:[{name:'Claude Opus 4.8',why:'#2 ranking, stronger coding'},{name:'DeepSeek V4-Pro',why:'Frontier reasoning at 1/1000th cost'}]},
+  {name:'GPT-5.5 (Azure OpenAI)',vendor:'OpenAI via Microsoft Azure',keys:['azure','microsoft','office','teams','sharepoint','365','m365','enterprise microsoft'],reason:'Both GPT-5.5 and Claude Opus 4.8 are available on Microsoft Azure AI. For Microsoft 365/Teams integrations, GPT-5.5 via Azure OpenAI Service is the most native choice. Also on Azure AI Foundry: Llama 4 Behemoth and Mistral Magistral for open-source and EU scenarios.',alts:[{name:'Claude Opus 4.8',why:'Azure AI Foundry, coding leader'},{name:'Mistral Magistral',why:'Azure + European compliance'}]},
+];
+function qf(q){document.getElementById('finIn').value=q;findModel();showTab('fi');}
+function findModel(){
+  const q=document.getElementById('finIn').value.toLowerCase();
+  if(!q.trim())return;
+  let best=null,bs=0;
+  for(const m of md){let s=m.keys.reduce((a,k)=>a+(q.includes(k)?1:0),0);if(s>bs){bs=s;best=m;}}
+  if(!best||bs===0)best={name:'Claude Sonnet 4.6',vendor:'Anthropic',reason:'As a solid all-rounder, Claude Sonnet 4.6 is recommended for general requirements — strong reasoning, 1M context, vision support, $3 input per 1M, Azure AI Foundry availability. For specific requirements try the chips above.',alts:[{name:'GPT-5.5',why:'Best general intelligence overall'},{name:'Grok 4.3',why:'Best price/Advanced agentic'}]};
+  const ah=(best.alts||[]).map(a=>`<div class="fac"><div class="fan">${a.name}</div><div class="faw">${a.why}</div></div>`).join('');
+  document.getElementById('fwin').innerHTML=`<div class="frk">&#10022; Best Model for Your Requirement</div><div class="fmo">${best.name}</div><div class="fve">by ${best.vendor}</div><div class="fre"><strong style="color:var(--tx);display:block;margin-bottom:6px">Why this model?</strong>${best.reason}</div>${ah?`<div class="fal"><div class="fall">Also consider</div><div class="facs">${ah}</div></div>`:''}`; 
+  document.getElementById('fres').classList.add('show');
+}
+document.getElementById('finIn').addEventListener('keydown',e=>{if(e.key==='Enter')findModel();});
+</script>
+</body>
+</html>
